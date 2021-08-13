@@ -1,3 +1,31 @@
 . {
  box-sizing: border-box;
 }
+
+.vkuiHorizontalCell__title {
+ text-align: center;
+ word-break: normal !important;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+}
+
+.vkuiHorizontalCell .vkuiTappable {
+ width: 130px;
+}
+
+.vkuiCard__in{
+ display: flex;
+}
+
+.vkuiCard__in .vkuiContentCard__tappable{
+ height: 100%;
+}
+
+.vkuiRichCell {
+ align-items: center;
+}
+
+.vkuiIcon {
+ display: inline-block;
+}

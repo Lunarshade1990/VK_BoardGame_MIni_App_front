@@ -1,58 +1,116 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
-import {BottomNavigation, BottomNavigationAction, Box} from "@material-ui/core";
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import DateRangeIcon from '@material-ui/icons/DateRange';
-import ViewListIcon from '@material-ui/icons/ViewList';
-import {AdaptivityProvider, AppRoot, ConfigProvider, withAdaptivity} from "@vkontakte/vkui";
-import axiosInstance from "./axios/axiosInstance";
+import {
+	AdaptivityProvider,
+	AppRoot,
+	ConfigProvider,
+	Panel,
+	Root,
+	usePlatform,
+	View,
+	withAdaptivity
+} from "@vkontakte/vkui";
 import {Profile} from "./components/Profile/Profile";
-import bridge from "@vkontakte/vk-bridge";
 import {useDispatch, useSelector} from "react-redux";
-import {setUserId} from "./store/rootReducer";
+import {
+	setUserId,
+	setUserFromDb,
+	setLoading,
+	setActiveView,
+	setGameCollectionLoadingStatus,
+	setGameList
+} from "./store/rootReducer";
+import {getUserInfo, getUserToken} from "./api/vkApi/bridgeApi";
+import {getUserById, getUserCollection, saveUserData} from "./api/backApi/userApi";
+import {Greetings} from "./components/newUser/Greetings";
+import {GameCollection} from "./boardGames/GameCollection";
+import {importGameCollection} from "./api/backApi/teseraApi";
+import {GameCollectionRichCell} from "./boardGames/GameCollectionRichCell";
 
 const App = (props) => {
-	const userId = useSelector((state) => state.rootReducer.userId);
 	const dispatch = useDispatch();
+	const activeView = useSelector((state) => state.rootReducer.activeView);
+	const gameList = useSelector((state) => state.rootReducer.gameList);
+	const activePanel = useSelector((state) => state.rootReducer.activePanel);
+	const gameCollectionLoadingStatus = useSelector((state) => state.rootReducer.gameCollectionLoadingStatus);
+	const user = useSelector((state) => state.rootReducer.user);
 
 	useEffect(() => {
-		bridge.send("VKWebAppGetUserInfo").then(data => {
-			console.log(data.id);
+		console.log(gameCollectionLoadingStatus);
+	}, [gameCollectionLoadingStatus]);
+
+	const platform = usePlatform();
+
+	useEffect(() => {
+		getUserInfo().then(data => {
 			dispatch(setUserId(data.id));
-			axiosInstance.get(`user/${data.id}`)
-				.then(r => console.log(r))
-				.catch(r => console.log(r));
+			getUserById(data.id)
+				.then(response => {
+					dispatch(setUserFromDb(response.data));
+					dispatch(setLoading(false));
+				})
+				.catch(error => {
+					console.log(error)
+					if (error.response?.status === 401) {
+						getUserToken()
+							.then(tokenData => {
+								const userdata = {...data, token: tokenData.access_token};
+								saveUserData(userdata)
+									.then(response => {
+										dispatch(setUserFromDb(response.data));
+										dispatch(setLoading(false));
+										dispatch(dispatch(setActiveView("view2")))
+									})
+									.catch(e=>console.log(e));
+							})
+							.catch(error => console.log(error));
+					}
+				});
 		});
-	});
+	}, []);
 
-	useEffect(() => {
-		if (userId !== 0) {
-			console.log(userId);
+	useEffect(() => console.log(user), [user]);
 
-		}
-	}, [userId]);
+	const importCollectionList = (teseraNickName) => {
+		dispatch(setActiveView("view1"));
+		dispatch(setGameCollectionLoadingStatus("loading"));
+		importGameCollection(teseraNickName).then(data =>
+			dispatch(setGameCollectionLoadingStatus("finish"))
+		).catch(error =>
+			dispatch(setGameCollectionLoadingStatus("error"))
+		)
+	}
+
+	const loadGameList = (id) => {
+			getUserCollection(id)
+				.then(response => {
+					dispatch(setGameList(response.data));
+				})
+	}
 
 
 	return (
-
 		<ConfigProvider>
 			<AdaptivityProvider>
-					<AppRoot>
-						<>
-							<Box style={{width: "100%", height: "calc(100vh - 56px"}}>
-								<Profile/>
-								<div/>
-							</Box>
-							<BottomNavigation showLabels value={"Профиль"} style={{width: "100%"}}>
-								<BottomNavigationAction label="Профиль" icon={<AccountCircleIcon />} />
-								<BottomNavigationAction label="Встречи" icon={<DateRangeIcon />} />
-								<BottomNavigationAction label="Список игр" icon={<ViewListIcon />} />
-							</BottomNavigation>
-						</>
-					</AppRoot>
+				<AppRoot>
+					<Root activeView={activeView}>
+						<View activePanel={activePanel} id="view1">
+							<Panel id="panel1.1">
+								<Profile loadGameList={(id) => loadGameList(id)}/>
+							</Panel>
+							<Panel id="panel1.2">
+								<GameCollectionRichCell gameList={gameList}/>
+							</Panel>
+						</View>
+						<View activePanel="panel2.1" id="view2">
+							<Panel id="panel2.1">
+								<Greetings onSubmit={(nick) => importCollectionList(nick)}/>
+							</Panel>
+						</View>
+					</Root>
+				</AppRoot>
 			</AdaptivityProvider>
 		</ConfigProvider>
-
 	);
 }
 

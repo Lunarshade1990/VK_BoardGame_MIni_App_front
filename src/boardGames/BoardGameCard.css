@@ -1,0 +1,20 @@
+.FullWidth {
+    width: 100%;
+}
+
+
+.CardContentContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.ContentContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.infoContainer {
+    display: flex !important;
+    flex-direction: row;
+}
