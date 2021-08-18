@@ -7,7 +7,14 @@ const initialState = {
     loading: true,
     userId: 0,
     user: {},
-    gameList: []
+    gameList: [],
+    activeModal: null,
+    isModalOpen: false,
+    collectionFilterParams: {
+        playersFilter: [0,0],
+        timeFilter: [0,0]
+    },
+    collectionFilter: new Map()
 }
 
 export const rootReducer = createSlice({
@@ -32,9 +39,29 @@ export const rootReducer = createSlice({
         setGameCollectionLoadingStatus (state, action) {
             state.gameCollectionLoadingStatus = action.payload;
         },
-
         setGameList (state, action) {
             state.gameList = action.payload;
+            const minPlayerCount = state.gameList.map(game => game.minPlayers);
+            const maxPlayerCount = state.gameList.map(game => game.maxPlayers);
+            state.collectionFilterParams.playersFilter = [Math.min.apply(Math, minPlayerCount), Math.max.apply(Math, maxPlayerCount)]
+            const minTime = state.gameList.map(game => game.minTime);
+            const maxTime = state.gameList.map(game => game.maxTime);
+            state.collectionFilterParams.timeFilter = [Math.min.apply(Math, minTime), Math.max.apply(Math, maxTime)]
+        },
+        setActiveModal (state, action) {
+            state.activeModal = action.payload;
+        },
+        setIsModalOpen (state, action) {
+            state.isModalOpen = action.payload;
+        },
+        setCollectionFilter (state, action) {
+            state.collectionFilter.set(action.payload.name, action.payload.config)
+        },
+        deleteCollectionFilter (state, action) {
+            state.collectionFilter.delete(action.payload)
+        },
+        setCollectionFilterParams (state, action) {
+            state.collectionFilterParams = action.payload;
         }
     }
 })
@@ -47,7 +74,11 @@ export const {
     setActiveView,
     setActivePanel,
     setGameCollectionLoadingStatus,
-    setGameList
+    setGameList,
+    setCollectionFilter,
+    deleteCollectionFilter,
+    setActiveModal,
+    setIsModalOpen
 } = rootReducer.actions
 
 export default rootReducer.reducer
