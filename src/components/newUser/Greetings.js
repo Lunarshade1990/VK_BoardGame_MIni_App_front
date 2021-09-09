@@ -31,7 +31,7 @@ export const Greetings = ({onSubmit}) => {
                             />
                         </FormItem>
                         <FormItem>
-                            <Button size="l" stretched onClick={onSubmit}>Импортировать</Button>
+                            <Button size="l" stretched onClick={() => onSubmit(teseraNickName)}>Импортировать</Button>
                         </FormItem>
                         <FormItem>
                             <Button size="l" stretched onClick={submitWithoutImport}>У меня ещё нет профиля на Тесере</Button>

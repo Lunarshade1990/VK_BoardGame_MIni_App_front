@@ -1,4 +1,5 @@
 const axios = require("axios");
+import Qs from 'qs'
 
 
 const buildHeader = () => {
@@ -14,7 +15,8 @@ const buildHeader = () => {
 
 const instance = axios.create({
     baseURL: 'http://localhost:8080/',
-    headers: buildHeader()
+    headers: buildHeader(),
+    paramsSerializer: params => Qs.stringify(params, {arrayFormat: 'comma'} )
 });
 
 export default instance;

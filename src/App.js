@@ -22,22 +22,27 @@ import {
 	setActiveModal,
 	setActiveView,
 	setGameCollectionLoadingStatus,
-	setGameList, setIsModalOpen,
+	setGameList,
 	setLoading,
 	setUserFromDb,
 	setUserId
 } from "./store/rootReducer";
 import {getUserInfo, getUserToken} from "./api/vkApi/bridgeApi";
-import {getUserById, getUserCollection, saveUserData} from "./api/backApi/userApi";
+import {getCollectionWithFilters, getUserById, getUserCollection, saveUserData} from "./api/backApi/userApi";
 import {Greetings} from "./components/newUser/Greetings";
 import {importGameCollection} from "./api/backApi/teseraApi";
-import {GameCollectionRichCell} from "./boardGames/GameCollectionRichCell";
+import {GameCollectionRichCard} from "./boardGames/GameCollectionRichCard";
 import {CollectionFilterModal} from "./boardGames/CollectionFiltersModal";
 import {Icon24Dismiss} from "@vkontakte/icons";
 
 const App = (props) => {
 	const dispatch = useDispatch();
 	const activeView = useSelector((state) => state.rootReducer.activeView);
+	const filtersCount = useSelector((state) => state.rootReducer.countOfActiveFilters);
+	const filtersChange = useSelector((state) => state.rootReducer.filtersChange);
+	const collectionFilter = useSelector((state) => state.rootReducer.collectionFilter);
+	const collectionFilterParams = useSelector((state) => state.rootReducer.collectionFilterParams);
+	const gameListInfo = useSelector((state) => state.rootReducer.gameListInfo);
 	const activeModal = useSelector((state) => state.rootReducer.activeModal);
 	const isModalOpen = useSelector((state) => state.rootReducer.isModalOpen);
 	const gameList = useSelector((state) => state.rootReducer.gameList);
@@ -91,15 +96,42 @@ const App = (props) => {
 		)
 	}
 
-	const loadGameList = (id) => {
-		getUserCollection(id)
+	const loadGameList = (id, type, setFilter) => {
+		getUserCollection(id, type)
 			.then(response => {
-				dispatch(setGameList(response.data));
+				dispatch(setGameList({data: response.data, setFilter}));
+			})
+	}
+
+	const loadGameListWithFilter = (id, type, setFilter, size = 10, page = 1) => {
+		getCollectionWithFilters(id, type, collectionFilter.filters, size, page)
+			.then(response => {
+				dispatch(setGameList({data: response.data, setFilter, size, page}));
 			})
 	}
 
 	const closeModal = () => {
-		dispatch(setActiveModal(null));
+		switch (activeModal) {
+			case 'collectionFilterModal':
+				const onClose = () => {
+					dispatch(setActiveModal(null));
+				}
+				onCloseFilterModal(onClose);
+				break;
+			default:
+		}
+	}
+
+	const onCloseFilterModal = (closeModalFunc) => {
+		if (filtersChange) {
+			getCollectionWithFilters(user.id, 'OWN', collectionFilter.filters, 10, 1)
+				.then(r => {
+					dispatch(setGameList({data: r.data}));
+					closeModalFunc();
+				});
+		} else {
+			closeModalFunc();
+		}
 	}
 
 	const modal = (
@@ -108,6 +140,8 @@ const App = (props) => {
 			activeModal={activeModal ? activeModal : null}>
 			<ModalPage
 				id="collectionFilterModal"
+				settlingHeight={100}
+				dynamicContentHeight = {true}
 				header={
 					<ModalPageHeader
 						left={platform !== IOS && <PanelHeaderClose onClick={closeModal}/>}
@@ -130,10 +164,12 @@ const App = (props) => {
 					<Root activeView={activeView}>
 						<View modal={modal} activePanel={activePanel} id="view1">
 							<Panel id="panel1.1">
-								<Profile loadGameList={(id) => loadGameList(id)}/>
+								<Profile loadGameList={(id, type, setFilter) => loadGameList(id, type, setFilter)}/>
 							</Panel>
 							<Panel id="panel1.2">
-								<GameCollectionRichCell gameList={gameList}/>
+								<GameCollectionRichCard id={user.id}
+														loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
+								/>
 							</Panel>
 						</View>
 						<View activePanel="panel2.1" id="view2">

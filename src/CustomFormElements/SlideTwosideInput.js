@@ -1,41 +1,40 @@
 import {CustomSideInput} from "./CustomSideInput";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {deleteCollectionFilter, setCollectionFilter} from "../store/rootReducer";
+import {setCollectionFilter} from "../store/rootReducer";
 
 
 export const SlideTwosideInput = ({param, title}) => {
 
+    const didMountRef = useRef(false);
     const dispatch = useDispatch();
 
-    const params = useSelector((state) => state.rootReducer.collectionFilterParams);
+    const params = useSelector((state) => state.rootReducer.collectionFilterParams.filters);
+    const filter = useSelector((state) => state.rootReducer.collectionFilter.filters);
     const LOW_BORDER =  params[param][0];
     const UPPER_BORDER =  params[param][1];
+    const initMin = filter[param][0];
+    const initMax = filter[param][1];
 
 
-    const [bindValue, setBindValue] = useState([params[param][0], params[param][1]]);
-    const [min, setMin] = useState(params[param][0]);
-    const [max, setMax] = useState(params[param][1]);
+    const [bindValue, setBindValue] = useState([initMin, initMax]);
+    const [min, setMin] = useState(initMin);
+    const [max, setMax] = useState(initMax);
     const [inputTimer, setInputTimer] = useState(null);
+    const [slideTimer, setSlideTimer] = useState(null);
 
-    const applyFilter = () => {
-        if (min !== LOW_BORDER || max !== UPPER_BORDER) {
-            dispatch(setCollectionFilter({
-                name: param,
-                config: {
-                    min: min,
-                    max: max
-                }
-            }));
-        } else dispatch(deleteCollectionFilter(param));
+    const setFilterOnChange = (bindValue) => {
+        dispatch(setCollectionFilter({filters: {[param]: bindValue}}));
     }
 
     useEffect(() => {
-        applyFilter();
-        return () => {
-            applyFilter()
-        };
-    }, [min, max]);
+        if (didMountRef.current) {
+            if (slideTimer) clearTimeout(slideTimer);
+            setSlideTimer(setTimeout(() => {
+                setFilterOnChange(bindValue);
+            }, 500));
+        } else didMountRef.current = true
+    }, [bindValue])
 
 
     const changeMin = (value) => {
@@ -63,7 +62,6 @@ export const SlideTwosideInput = ({param, title}) => {
 
     return (
         <CustomSideInput
-            onClose = {applyFilter}
             boundInput={bindValue}
             min={LOW_BORDER}
             max={UPPER_BORDER}

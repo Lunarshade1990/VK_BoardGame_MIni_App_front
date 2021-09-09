@@ -44,13 +44,13 @@ export const Profile = ({loadGameList}) => {
 
     useEffect(() => {
         if (user.id && gameCollectionLoadingStatus === 'idle') {
-            loadGameList(user.id);
+            loadGameList(user.id, "OWN", true);
         }
     }, [user]);
 
     useEffect(() => {
         if (gameCollectionLoadingStatus === 'finish') {
-            loadGameList(user.id);
+            loadGameList(user.id, "OWN", true);
         }
     }, [gameCollectionLoadingStatus]);
 

@@ -3,7 +3,7 @@ import React from "react";
 import {useSelector} from "react-redux";
 import {Box, Card, CardContent, CardMedia, Grid, Typography} from "@material-ui/core";
 
-export const GameCollection = () => {
+export const GameCollectionCards = () => {
 
     const gameList = useSelector((state) => state.rootReducer.gameList);
 

@@ -1,4 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit'
+import {createSlice} from '@reduxjs/toolkit';
+
+const lodash = require('lodash');
 
 const initialState = {
     gameCollectionLoadingStatus: 'idle',
@@ -8,13 +10,39 @@ const initialState = {
     userId: 0,
     user: {},
     gameList: [],
+    gameListInfo: {
+        totalPages: 0,
+        totalElements: 0
+    },
     activeModal: null,
     isModalOpen: false,
     collectionFilterParams: {
-        playersFilter: [0,0],
-        timeFilter: [0,0]
+        filters: {
+            players: [0, 999],
+            time: [0, 999],
+            mode: [0, 999],
+            modeName: ''
+        }
     },
-    collectionFilter: new Map()
+    collectionFilter: {
+        filterConfig: {
+            activeFilters: []
+        },
+        filters: {
+            players: [0, 999],
+            time: [0, 999],
+            mode: [0, 999],
+            modeName: ''
+        }
+    },
+    countOfActiveFilters: 0,
+    filtersChange: false,
+    filterQuery: {
+        minTime: 0,
+        maxTime: 999,
+        minPlayers: 0,
+        maxPlayers: 999
+    }
 }
 
 export const rootReducer = createSlice({
@@ -40,13 +68,15 @@ export const rootReducer = createSlice({
             state.gameCollectionLoadingStatus = action.payload;
         },
         setGameList (state, action) {
-            state.gameList = action.payload;
-            const minPlayerCount = state.gameList.map(game => game.minPlayers);
-            const maxPlayerCount = state.gameList.map(game => game.maxPlayers);
-            state.collectionFilterParams.playersFilter = [Math.min.apply(Math, minPlayerCount), Math.max.apply(Math, maxPlayerCount)]
-            const minTime = state.gameList.map(game => game.minTime);
-            const maxTime = state.gameList.map(game => game.maxTime);
-            state.collectionFilterParams.timeFilter = [Math.min.apply(Math, minTime), Math.max.apply(Math, maxTime)]
+            state.gameList = action.payload.data.content;
+            state.gameListInfo.totalPages = action.payload.data.totalPages;
+            state.gameListInfo.totalElements = action.payload.data.totalElements;
+            state.collectionFilterParams.filters.players = [action.payload.data.collectionInfo.minPlayers, action.payload.data.collectionInfo.maxPlayers];
+            state.collectionFilterParams.filters.mode = [action.payload.data.collectionInfo.minPlayers === 0 ? 1 : action.payload.data.collectionInfo.minPlayers, action.payload.data.collectionInfo.maxPlayers];
+            state.collectionFilterParams.filters.time = [action.payload.data.collectionInfo.minTime, action.payload.data.collectionInfo.maxTime];
+            if (action.payload.setFilter) {
+                state.collectionFilter.filters = {...state.collectionFilterParams.filters};
+            }
         },
         setActiveModal (state, action) {
             state.activeModal = action.payload;
@@ -55,16 +85,77 @@ export const rootReducer = createSlice({
             state.isModalOpen = action.payload;
         },
         setCollectionFilter (state, action) {
-            state.collectionFilter.set(action.payload.name, action.payload.config)
+
+            const oldFilters = state.collectionFilter.filters;
+
+            if (action.payload.filters) {
+
+                if (Object.keys(action.payload.filters).length === 1) {
+                    const filter = Object.keys(action.payload.filters)[0];
+                    const diff = lodash.difference(state.collectionFilterParams.filters[filter], action.payload.filters[filter]);
+                    const filterChanges = (diff.length > 0);
+                    const isNewFilter = !state.collectionFilter.filterConfig.activeFilters.includes(filter);
+                    if (filterChanges) {
+                        if (isNewFilter) {
+                            state.collectionFilter.filterConfig.activeFilters.push(filter);
+                        }
+                        state.collectionFilter.filters = {
+                            ...state.collectionFilter.filters,
+                            ...action.payload.filters,
+                            ...action.payload.filterConfig
+                        }
+                    } else if (!filterChanges){
+                        lodash.pull(state.collectionFilter.filterConfig.activeFilters, filter);
+                        state.collectionFilter.filters = {
+                            ...state.collectionFilter.filters,
+                            [filter]: state.collectionFilterParams.filters[filter],
+                            modeName: ''
+                        }
+                    }
+                } else {
+                    state.collectionFilter.filters = {
+                        ...state.collectionFilter.filters,
+                        ...action.payload.filters,
+                        ...action.payload.filterConfig
+                    }
+                    state.collectionFilter.filterConfig.activeFilters = [];
+                }
+            } else {
+                state.collectionFilter.filters = {
+                    ...state.collectionFilter.filters,
+                    ...action.payload.filterConfig
+                }
+            }
+
+            state.filtersChange = lodash.difference(oldFilters, state.collectionFilter.filters);
+            state.countOfActiveFilters = state.collectionFilter.filterConfig.activeFilters.length;
         },
-        deleteCollectionFilter (state, action) {
-            state.collectionFilter.delete(action.payload)
+
+        resetCollectionModeFilter (state, _action) {
+            state.collectionFilter.filters.mode = state.collectionFilterParams.filters.mode;
+        },
+        clearCollectionFilter (state) {
+            state.collectionFilter.filters = {
+                ...state.collectionFilterParams.filters
+            };
+            state.filtersChange = true;
+            state.countOfActiveFilters = 0;
         },
         setCollectionFilterParams (state, action) {
             state.collectionFilterParams = action.payload;
         }
     }
 })
+
+// const getActiveFilterCount = (state) => {
+//     let counter = 0;
+//     for (let key in state.collectionFilterParams) {
+//         if (lodash.difference(state.collectionFilterParams[key], state.collectionFilter[key]).length > 0) {
+//             counter++;
+//         }
+//     }
+//     return counter;
+// }
 
 // Action creators are generated for each case reducer function
 export const {
@@ -76,9 +167,12 @@ export const {
     setGameCollectionLoadingStatus,
     setGameList,
     setCollectionFilter,
-    deleteCollectionFilter,
+    resetCollectionModeFilter,
+    clearCollectionFilter,
     setActiveModal,
     setIsModalOpen
 } = rootReducer.actions
 
 export default rootReducer.reducer
+
+
