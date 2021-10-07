@@ -70,11 +70,11 @@ export const GameCard = ({game}) => {
                     <Box sx={{padding: 2}}>
                         <UsersStack
                             photos={game.boardGameCollections
-                                .filter(c => c.collection.collectionType	=== "OWN")
-                                .map(c => c.collection.appUser.avatarUrl)}
+                                .filter(c => c.type	=== "OWN")
+                                .map(c => c.owner.avatarUrl)}
                             count={3}
                         >В коллекции у {declOfNum(game.boardGameCollections
-                            .filter(c => c.collection.collectionType	=== "OWN").length, titles)}</UsersStack>
+                            .filter(c => c.type	=== "OWN").length, titles)}</UsersStack>
                     </Box>
                 </Box>
             </Box>

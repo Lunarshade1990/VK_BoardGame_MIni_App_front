@@ -17,7 +17,6 @@ const getUserCollection = async (id, type) => {
 export const getCollectionWithFilters = async (id, type, filterConfig, size = 10, page = 1) => {
     return await axiosInstance.get(`user/${id}/collection/${type}`, {
         params: {
-            id,
             ...filterConfig,
             size,
             page,

@@ -3,7 +3,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import {
 	AdaptivityProvider,
 	AppRoot,
-	ConfigProvider,
+	ConfigProvider, Epic,
 	IOS,
 	ModalPage,
 	ModalPageHeader,
@@ -34,8 +34,9 @@ import {importGameCollection} from "./api/backApi/teseraApi";
 import {GameCollectionRichCard} from "./boardGames/GameCollectionRichCard";
 import {CollectionFilterModal} from "./boardGames/CollectionFiltersModal";
 import {Icon24Dismiss} from "@vkontakte/icons";
+import {AppTabbar} from "./components/NavBar/AppTabbar";
 
-const App = (props) => {
+const App = () => {
 	const dispatch = useDispatch();
 	const activeView = useSelector((state) => state.rootReducer.activeView);
 	const filtersCount = useSelector((state) => state.rootReducer.countOfActiveFilters);
@@ -158,29 +159,28 @@ const App = (props) => {
 
 
 	return (
-		<ConfigProvider scheme={"bright_light"}>
-			<AdaptivityProvider>
-				<AppRoot>
-					<Root activeView={activeView}>
-						<View modal={modal} activePanel={activePanel} id="view1">
-							<Panel id="panel1.1">
-								<Profile loadGameList={(id, type, setFilter) => loadGameList(id, type, setFilter)}/>
-							</Panel>
-							<Panel id="panel1.2">
-								<GameCollectionRichCard id={user.id}
-														loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
-								/>
-							</Panel>
-						</View>
-						<View activePanel="panel2.1" id="view2">
-							<Panel id="panel2.1">
-								<Greetings onSubmit={(nick) => importCollectionList(nick)}/>
-							</Panel>
-						</View>
-					</Root>
-				</AppRoot>
-			</AdaptivityProvider>
-		</ConfigProvider>
+		<AppRoot>
+			<Epic activeStory={"profile"} tabbar={<AppTabbar/>}>
+				<Root id={"profile"} activeView={activeView}>
+					<View modal={modal} activePanel={activePanel} id="view1">
+						<Panel id="panel1.1">
+							<Profile loadGameList={(id, type, setFilter) => loadGameList(id, type, setFilter)}/>
+						</Panel>
+						<Panel id="panel1.2">
+							<GameCollectionRichCard id={user.id}
+													loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
+							/>
+						</Panel>
+					</View>
+					<View activePanel="panel2.1" id="view2">
+						<Panel id="panel2.1">
+							<Greetings onSubmit={(nick) => importCollectionList(nick)}/>
+						</Panel>
+					</View>
+				</Root>
+			</Epic>
+		</AppRoot>
+
 	);
 }
 

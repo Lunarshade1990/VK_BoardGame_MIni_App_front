@@ -32,7 +32,8 @@ const initialState = {
             players: [0, 999],
             time: [0, 999],
             mode: [0, 999],
-            modeName: ''
+            modeName: '',
+            search: null,
         }
     },
     countOfActiveFilters: 0,
@@ -70,9 +71,9 @@ export const rootReducer = createSlice({
         setGameList (state, action) {
             state.gameList = action.payload.data.content;
             state.gameListInfo.totalPages = action.payload.data.totalPages;
-            state.gameListInfo.totalElements = action.payload.data.totalElements;
-            state.collectionFilterParams.filters.players = [action.payload.data.collectionInfo.minPlayers, action.payload.data.collectionInfo.maxPlayers];
-            state.collectionFilterParams.filters.mode = [action.payload.data.collectionInfo.minPlayers === 0 ? 1 : action.payload.data.collectionInfo.minPlayers, action.payload.data.collectionInfo.maxPlayers];
+            state.gameListInfo.totalElements = action.payload.data.collectionInfo.totalElements;
+            state.collectionFilterParams.filters.players = [action.payload.data.collectionInfo.minPlayerNumber, action.payload.data.collectionInfo.maxPlayerNumber];
+            state.collectionFilterParams.filters.mode = [action.payload.data.collectionInfo.minPlayerNumber === 0 ? 1 : action.payload.data.collectionInfo.minPlayerNumber, action.payload.data.collectionInfo.maxPlayerNumber];
             state.collectionFilterParams.filters.time = [action.payload.data.collectionInfo.minTime, action.payload.data.collectionInfo.maxTime];
             if (action.payload.setFilter) {
                 state.collectionFilter.filters = {...state.collectionFilterParams.filters};
