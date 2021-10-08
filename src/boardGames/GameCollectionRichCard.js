@@ -8,7 +8,7 @@ import {
     SubnavigationBar,
     SubnavigationButton
 } from "@vkontakte/vkui";
-import React, {useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {Box, Pagination, Stack} from "@material-ui/core";
 import {Icon24Filter} from '@vkontakte/icons';
@@ -21,14 +21,22 @@ export const GameCollectionRichCard = ({loadGameList}) => {
 
     const dispatch = useDispatch();
     const filtersCount = useSelector((state) => state.rootReducer.countOfActiveFilters);
-    const gameList = useSelector((state) => state.rootReducer.gameList);
+    const gameListPage = useSelector((state) => state.rootReducer.gameListPage);
     const gameListInfo = useSelector((state) => state.rootReducer.gameListInfo);
     // const filterConfig = useSelector((state) => state.rootReducer.collectionFilterParams);
-    // const filter = useSelector((state) => state.rootReducer.collectionFilter);
+    const filter = useSelector((state) => state.rootReducer.collectionFilter);
     const [currentPage, setCurrentPage] = useState(1);
-
-
     const [searchValue, setSearchValue] = useState('');
+
+    useEffect(() => {
+        setSearchFilter();
+        return setSearchFilter.cancel;
+    }, [searchValue]);
+
+    useEffect(() => {
+        loadGameList('OWN', currentPage);
+    }, [filter.filters.search]);
+
 
     const goBack = () => {
         dispatch(setActivePanel('panel1.1'));
@@ -40,8 +48,8 @@ export const GameCollectionRichCard = ({loadGameList}) => {
         dispatch(setActiveModal("collectionFilterModal"));
     }
 
-    const cards = !gameList ? null :
-        [...gameList].map(game => {
+    const cards = !gameListPage ? null :
+        [...gameListPage.content].map(game => {
             return <GameCard game={game}/>
         })
 
@@ -52,21 +60,24 @@ export const GameCollectionRichCard = ({loadGameList}) => {
 
     const onInputChange = (value) => {
         setSearchValue(value);
-        const setSearch = () => {
-            dispatch(setCollectionFilter({search: value}));
-            loadGameList('OWN', currentPage);
-        }
-
-        _function.debounce(setSearch, 100);
+        setSearchFilter(value)
     }
 
+    const setSearchFilter = useCallback(_function.debounce(() => dispatchSearchFilter(searchValue), 500), [searchValue])
+
+    const dispatchSearchFilter = (value) => {
+        dispatch(setCollectionFilter({filters: {search: value}}));
+    }
+
+
+
     const filterCountAndClear = filtersCount === 0 ? null :(
-    <Stack direction={"row"} spacing={2} display={"flex"}>
-        <Counter mode="primary" size="s">{filtersCount === 0 ? null : filtersCount}</Counter>
-    </Stack>)
+        <Stack direction={"row"} spacing={2} display={"flex"}>
+            <Counter mode="primary" size="s">{filtersCount === 0 ? null : filtersCount}</Counter>
+        </Stack>)
 
     return (
-        !gameList ? <PanelSpinner/> :
+        !gameListPage.content ? <PanelSpinner/> :
             <>
                 <PanelHeader left={<PanelHeaderBack onClick={goBack}/>} separator={false}>Коллекция</PanelHeader>
                 <Group>
@@ -80,6 +91,12 @@ export const GameCollectionRichCard = ({loadGameList}) => {
                         >
                             Фильтры
                         </SubnavigationButton>
+                        <SubnavigationButton
+                            selected
+                            expandable
+                        >
+                            Коллекция
+                        </SubnavigationButton>
                     </SubnavigationBar>
                     <Search value={searchValue} onChange={(e) => onInputChange(e.target.value)} after={null}/>
                     <Box>{cards}</Box>
@@ -88,7 +105,7 @@ export const GameCollectionRichCard = ({loadGameList}) => {
                                      showFirstButton={true}
                                      showLastButton={true}
                                      color={"primary"}
-                                     count={gameListInfo.totalPages}
+                                     count={gameListPage.totalPages}
                                      onChange={onPageChange}
                         />
                     </Box>

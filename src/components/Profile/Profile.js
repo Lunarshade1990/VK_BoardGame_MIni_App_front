@@ -38,7 +38,7 @@ export const Profile = ({loadGameList}) => {
 
     const user = useSelector((state) => state.rootReducer.user);
     const loading = useSelector((state) => state.rootReducer.loading);
-    const gameList = useSelector((state) => state.rootReducer.gameList);
+    const gameListPage = useSelector((state) => state.rootReducer.gameListPage);
     const gameCollectionLoadingStatus = useSelector((state) => state.rootReducer.gameCollectionLoadingStatus);
     const dispatch = useDispatch();
 
@@ -60,6 +60,8 @@ export const Profile = ({loadGameList}) => {
 
 
     let collection = null;
+
+    const gameList = gameListPage.content;
 
     if (gameList.length > 0) {
         collection = (

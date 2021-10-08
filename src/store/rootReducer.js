@@ -10,6 +10,11 @@ const initialState = {
     userId: 0,
     user: {},
     gameList: [],
+    gameListPage: {
+        content: [],
+        totalPages: 0,
+        totalElements: 0
+    },
     gameListInfo: {
         totalPages: 0,
         totalElements: 0
@@ -21,7 +26,8 @@ const initialState = {
             players: [0, 999],
             time: [0, 999],
             mode: [0, 999],
-            modeName: ''
+            modeName: '',
+            search: '',
         }
     },
     collectionFilter: {
@@ -33,7 +39,7 @@ const initialState = {
             time: [0, 999],
             mode: [0, 999],
             modeName: '',
-            search: null,
+            search: '',
         }
     },
     countOfActiveFilters: 0,
@@ -69,8 +75,7 @@ export const rootReducer = createSlice({
             state.gameCollectionLoadingStatus = action.payload;
         },
         setGameList (state, action) {
-            state.gameList = action.payload.data.content;
-            state.gameListInfo.totalPages = action.payload.data.totalPages;
+            state.gameListPage = action.payload.data.response;
             state.gameListInfo.totalElements = action.payload.data.collectionInfo.totalElements;
             state.collectionFilterParams.filters.players = [action.payload.data.collectionInfo.minPlayerNumber, action.payload.data.collectionInfo.maxPlayerNumber];
             state.collectionFilterParams.filters.mode = [action.payload.data.collectionInfo.minPlayerNumber === 0 ? 1 : action.payload.data.collectionInfo.minPlayerNumber, action.payload.data.collectionInfo.maxPlayerNumber];
@@ -93,7 +98,15 @@ export const rootReducer = createSlice({
 
                 if (Object.keys(action.payload.filters).length === 1) {
                     const filter = Object.keys(action.payload.filters)[0];
-                    const diff = lodash.difference(state.collectionFilterParams.filters[filter], action.payload.filters[filter]);
+                    let initValue, newValue;
+                    if (typeof action.payload.filters[filter] === 'string') {
+                        newValue = action.payload.filters[filter].split();
+                        initValue = state.collectionFilterParams.filters[filter].split();
+                    } else {
+                        newValue = action.payload.filters[filter];
+                        initValue = state.collectionFilterParams.filters[filter];
+                    }
+                    const diff = lodash.difference(initValue, newValue);
                     const filterChanges = (diff.length > 0);
                     const isNewFilter = !state.collectionFilter.filterConfig.activeFilters.includes(filter);
                     if (filterChanges) {

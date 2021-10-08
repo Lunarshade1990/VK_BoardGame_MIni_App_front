@@ -1,5 +1,7 @@
 import React, {useState} from "react";
 import {Icon28AllCategoriesOutline, Icon28Profile, Icon56EventOutline} from '@vkontakte/icons';
+import { Icon28Users3Outline } from '@vkontakte/icons';
+import { Icon28AddSquareOutline } from '@vkontakte/icons';
 import {Tabbar, TabbarItem} from "@vkontakte/vkui";
 
 export const AppTabbar = (props) => {
@@ -14,6 +16,18 @@ export const AppTabbar = (props) => {
                 data-story="profile"
                 text="Профиль"
             ><Icon28Profile /></TabbarItem>
+            <TabbarItem
+                onClick={onStoryChange}
+                selected={activeStory === 'players'}
+                data-story="players"
+                text="Игроки"
+            ><Icon28Users3Outline /></TabbarItem>
+            <TabbarItem
+                onClick={onStoryChange}
+                selected={activeStory === 'createEvent'}
+                data-story="createEvent"
+                text="Создать событие"
+            ><Icon28AddSquareOutline/></TabbarItem>
             <TabbarItem
                 onClick={onStoryChange}
                 selected={activeStory === 'events'}
