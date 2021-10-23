@@ -6,7 +6,7 @@ import {getPlaceTables} from "../../api/backApi/PlacesApi";
 import {CREATE_TABLE} from "./Panels";
 import {SelectableCellWithEditRemoveButtons} from "./SelectableCellWithEditRemoveButtons";
 
-export const TableAdding = ({selectedPlace, addPanelInStack}) => {
+export const TableAdding = ({selectedPlace, addPanelInStack, onEditTable}) => {
 
     const [tables, setTables] = useState([]);
 
@@ -27,6 +27,7 @@ export const TableAdding = ({selectedPlace, addPanelInStack}) => {
                     До {table.maxPlayersNumber} человек<br/>
                     {table?.deskShape === "CIRCLE" ? 'Овальный' : 'Прямоуголный'}
                 </>}
+                                                 onEdit={() => onEditTable(table)}
             />
         )
     })

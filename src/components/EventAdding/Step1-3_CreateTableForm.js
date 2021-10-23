@@ -1,8 +1,8 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, FormItem, FormLayout, FormLayoutGroup, Group, Input, Radio} from "@vkontakte/vkui";
 import {StandardPanelHeader} from "../NavElements/StandardPanelHeader";
 
-export const CreateTableForm = ({onSaveTable}) => {
+export const CreateTableForm = ({onSaveTable, table}) => {
 
     const [name, setName] = useState('');
     const [length, setLength] = useState('');
@@ -10,8 +10,20 @@ export const CreateTableForm = ({onSaveTable}) => {
     const [max, setMax] = useState('');
     const [shape, setShape] = useState('');
 
+    useEffect(() => {
+        if (table) {
+            setName(table.name);
+            setLength(table.length);
+            setWidth(table.width);
+            setMax(table.maxPlayersNumber);
+            setShape(table.deskShape.toLowerCase());
+        }
+    }, [table]);
+
+
     const onSaveButtonClick = () => {
         const form = {
+            id: table ? table.id : null,
             name: name,
             width: width,
             length: length,

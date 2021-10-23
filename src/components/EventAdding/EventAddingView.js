@@ -21,7 +21,8 @@ class EventAddingView extends React.Component {
         super(props);
         this.state = {
             isPublic: false,
-            selectedPlace: {}
+            selectedPlace: {},
+            selectedTable: null
         }
     }
 
@@ -48,9 +49,17 @@ class EventAddingView extends React.Component {
     onSaveTable(placeForm) {
        saveNewTable(this.state.selectedPlace.id, placeForm)
            .then(r => {
-               this.props.goToPreviousPanel()
+               this.props.goToPreviousPanel();
+               this.setState({selectedTable: null})
            })
            .catch(e => console.log(e));
+    }
+
+    editTable(table) {
+        this.setState({selectedTable: table}, () => {
+            this.props.addPanelInStack(CREATE_TABLE);
+        });
+
     }
 
     render() {
@@ -67,11 +76,17 @@ class EventAddingView extends React.Component {
                         onContinue={(panel, placeConf) => this.saveNewUserPlace(panel, placeConf)}/>
                 </Panel>
                 <Panel id={TABLE_ADDING}>
-                    <TableAdding selectedPlace={this.state.selectedPlace} addPanelInStack={this.props.addPanelInStack}/>
+                    <TableAdding
+                        selectedPlace={this.state.selectedPlace}
+                        addPanelInStack={this.props.addPanelInStack}
+                        onEditTable={(table) => this.editTable(table)}
+                    />
                 </Panel>
                 <Panel id={CREATE_TABLE}>
                     <CreateTableForm
-                        onSaveTable={(placeForm) => this.onSaveTable(placeForm)}/>
+                        onSaveTable={(placeForm) => this.onSaveTable(placeForm)}
+                        table={this.state.selectedTable}
+                    />
                 </Panel>
             </View>
         )
