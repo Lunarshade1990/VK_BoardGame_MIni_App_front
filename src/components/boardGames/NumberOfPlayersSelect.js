@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {Box, Chip, Stack} from "@material-ui/core";
 import {SlideTwosideInput} from "../CustomFormElements/SlideTwosideInput";
 import {useDispatch, useSelector} from "react-redux";
-import {resetCollectionModeFilter, setCollectionFilter} from "../store/rootReducer";
+import {resetCollectionModeFilter, setCollectionFilter} from "../../store/rootReducer";
 
 export const NumberOfPlayersSelect = () => {
 

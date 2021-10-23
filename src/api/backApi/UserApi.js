@@ -24,4 +24,8 @@ export const getCollectionWithFilters = async (id, type, filterConfig, size = 10
     });
 }
 
+export const getUserPlaces = async (id) => {
+    return await axiosInstance.get(`user/${id}/places`);
+}
+
 export {getUserById, saveUserData, getUserCollection};

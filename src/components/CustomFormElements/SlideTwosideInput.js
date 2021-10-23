@@ -1,7 +1,7 @@
 import {CustomSideInput} from "./CustomSideInput";
 import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {setCollectionFilter} from "../store/rootReducer";
+import {setCollectionFilter} from "../../store/rootReducer";
 
 
 export const SlideTwosideInput = ({param, title}) => {

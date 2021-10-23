@@ -1,13 +1,21 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Icon28AllCategoriesOutline, Icon28Profile, Icon56EventOutline} from '@vkontakte/icons';
 import { Icon28Users3Outline } from '@vkontakte/icons';
 import { Icon28AddSquareOutline } from '@vkontakte/icons';
 import {Tabbar, TabbarItem} from "@vkontakte/vkui";
+import {useDispatch} from "react-redux";
+import {setActiveView} from "../../store/rootReducer";
 
 export const AppTabbar = (props) => {
 
+    const dispatch = useDispatch();
     const [activeStory, setActiveStory] = React.useState('profile');
     const onStoryChange = (e) => setActiveStory(e.currentTarget.dataset.story);
+
+    useEffect(() => {
+        dispatch(setActiveView(activeStory));
+    }, [activeStory]);
+
     return (
         <Tabbar>
             <TabbarItem

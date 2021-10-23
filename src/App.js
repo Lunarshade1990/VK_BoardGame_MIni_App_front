@@ -1,9 +1,8 @@
 import React, {useEffect} from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
 import {
-	AdaptivityProvider,
 	AppRoot,
-	ConfigProvider, Epic,
+	Epic,
 	IOS,
 	ModalPage,
 	ModalPageHeader,
@@ -28,13 +27,14 @@ import {
 	setUserId
 } from "./store/rootReducer";
 import {getUserInfo, getUserToken} from "./api/vkApi/bridgeApi";
-import {getCollectionWithFilters, getUserById, getUserCollection, saveUserData} from "./api/backApi/userApi";
+import {getCollectionWithFilters, getUserById, getUserCollection, saveUserData} from "./api/backApi/UserApi";
 import {Greetings} from "./components/newUser/Greetings";
-import {importGameCollection} from "./api/backApi/teseraApi";
-import {GameCollectionRichCard} from "./boardGames/GameCollectionRichCard";
-import {CollectionFilterModal} from "./boardGames/CollectionFiltersModal";
+import {importGameCollection} from "./api/backApi/TeseraApi";
+import {GameCollectionRichCard} from "./components/boardGames/GameCollectionRichCard";
+import {CollectionFilterModal} from "./components/boardGames/CollectionFiltersModal";
 import {Icon24Dismiss} from "@vkontakte/icons";
-import {AppTabbar} from "./components/NavBar/AppTabbar";
+import {AppTabbar} from "./components/NavElements/AppTabbar";
+import EventAddingView from "./components/EventAdding/EventAddingView";
 
 const App = () => {
 	const dispatch = useDispatch();
@@ -47,6 +47,7 @@ const App = () => {
 	const activeModal = useSelector((state) => state.rootReducer.activeModal);
 	const isModalOpen = useSelector((state) => state.rootReducer.isModalOpen);
 	const gameList = useSelector((state) => state.rootReducer.gameList);
+	const panelStack = useSelector((state) => state.rootReducer.panelStack);
 	const activePanel = useSelector((state) => state.rootReducer.activePanel);
 	const gameCollectionLoadingStatus = useSelector((state) => state.rootReducer.gameCollectionLoadingStatus);
 	const user = useSelector((state) => state.rootReducer.user);
@@ -162,7 +163,7 @@ const App = () => {
 		<AppRoot>
 			<Epic activeStory={"profile"} tabbar={<AppTabbar/>}>
 				<Root id={"profile"} activeView={activeView}>
-					<View modal={modal} activePanel={activePanel} id="view1">
+					<View modal={modal} activePanel={activePanel} id="profile">
 						<Panel id="panel1.1">
 							<Profile loadGameList={(id, type, setFilter) => loadGameList(id, type, setFilter)}/>
 						</Panel>
@@ -177,6 +178,7 @@ const App = () => {
 							<Greetings onSubmit={(nick) => importCollectionList(nick)}/>
 						</Panel>
 					</View>
+					<EventAddingView id={"createEvent"} userId={user.id}/>
 				</Root>
 			</Epic>
 		</AppRoot>

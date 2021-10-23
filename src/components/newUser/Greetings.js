@@ -1,9 +1,7 @@
-import {Button, FormItem, FormLayout, Group, Input, Panel, PanelHeader, View} from "@vkontakte/vkui";
+import {Button, FormItem, FormLayout, Group, Input, PanelHeader} from "@vkontakte/vkui";
 import React, {useState} from "react";
 import {useDispatch} from "react-redux";
-import {setActiveView, setGameCollectionLoadingStatus} from "../../store/rootReducer";
-import {importGameCollection} from "../../api/backApi/teseraApi";
-
+import {setActiveView} from "../../store/rootReducer";
 
 
 export const Greetings = ({onSubmit}) => {

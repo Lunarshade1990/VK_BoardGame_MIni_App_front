@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import {Icon24ClockOutline, Icon28Users3Outline} from "@vkontakte/icons";
 import {UsersStack} from "@vkontakte/vkui";
-import {declOfNum} from "../Util/Util";
+import {declOfNum} from "../../Util/Util";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import React from "react";
 

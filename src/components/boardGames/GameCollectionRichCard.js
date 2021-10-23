@@ -12,7 +12,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {Box, Pagination, Stack} from "@material-ui/core";
 import {Icon24Filter} from '@vkontakte/icons';
-import {setActiveModal, setActivePanel, setCollectionFilter, setIsModalOpen} from "../store/rootReducer";
+import {setActiveModal, setActivePanel, setCollectionFilter, setIsModalOpen} from "../../store/rootReducer";
 import {GameCard} from "./GameCard";
 
 const _function = require('lodash/function');

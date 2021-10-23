@@ -1,0 +1,5 @@
+export const PLACE_CHOICE = 'PLACE_CHOICE';
+export const NEW_ADDRESS_CREATING = 'NEW_ADDRESS_CREATING';
+export const TABLE_ADDING = 'TABLE_ADDING';
+export const CREATE_EVENT = 'CREATE_EVENT';
+export const CREATE_TABLE = 'CREATE_TABLE';

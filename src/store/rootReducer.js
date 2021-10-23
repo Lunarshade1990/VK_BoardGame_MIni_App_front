@@ -1,10 +1,11 @@
 import {createSlice} from '@reduxjs/toolkit';
+import ViewStartingPanels from "../components/ViewStartingPanels";
 
 const lodash = require('lodash');
 
 const initialState = {
     gameCollectionLoadingStatus: 'idle',
-    activeView: "view1",
+    activeView: "profile",
     activePanel: "panel1.1",
     loading: true,
     userId: 0,
@@ -49,7 +50,8 @@ const initialState = {
         maxTime: 999,
         minPlayers: 0,
         maxPlayers: 999
-    }
+    },
+    panelStack: ['panel1.1']
 }
 
 export const rootReducer = createSlice({
@@ -67,6 +69,19 @@ export const rootReducer = createSlice({
         },
         setActiveView (state, action) {
             state.activeView = action.payload;
+            state.panelStack = [ViewStartingPanels[action.payload]]
+        },
+
+        addPanelInStack (state, action) {
+            state.panelStack.push(action.payload);
+            const ind = state.panelStack.length - 1;
+            state.activePanel = state.panelStack[ind];
+        },
+
+        goToPreviousPanel (state) {
+            state.panelStack.pop();
+            const ind = state.panelStack.length - 1;
+            state.activePanel = state.panelStack[ind];
         },
         setActivePanel (state, action) {
             state.activePanel = action.payload;
@@ -161,16 +176,6 @@ export const rootReducer = createSlice({
     }
 })
 
-// const getActiveFilterCount = (state) => {
-//     let counter = 0;
-//     for (let key in state.collectionFilterParams) {
-//         if (lodash.difference(state.collectionFilterParams[key], state.collectionFilter[key]).length > 0) {
-//             counter++;
-//         }
-//     }
-//     return counter;
-// }
-
 // Action creators are generated for each case reducer function
 export const {
     setUserId,
@@ -184,7 +189,9 @@ export const {
     resetCollectionModeFilter,
     clearCollectionFilter,
     setActiveModal,
-    setIsModalOpen
+    setIsModalOpen,
+    goToPreviousPanel,
+    addPanelInStack
 } = rootReducer.actions
 
 export default rootReducer.reducer
