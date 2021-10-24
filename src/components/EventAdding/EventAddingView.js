@@ -2,7 +2,7 @@ import {Panel, View} from "@vkontakte/vkui";
 import {PlaceChoice} from "./Step1-0_PlaceChoice";
 import {NewAddressCreating} from "./Step1-1_NewAddressCreating";
 import React from "react";
-import {saveNewTable, saveNewUserPlace} from "../../api/backApi/PlacesApi";
+import {deleteTable, saveNewTable, saveNewUserPlace, updateTable} from "../../api/backApi/PlacesApi";
 import {TableAdding} from "./Step1-2_TableAdding";
 import {connect} from "react-redux";
 import {addPanelInStack, goToPreviousPanel} from "../../store/rootReducer";
@@ -22,7 +22,8 @@ class EventAddingView extends React.Component {
         this.state = {
             isPublic: false,
             selectedPlace: {},
-            selectedTable: null
+            selectedTable: null,
+            panelShouldUpdate: true
         }
     }
 
@@ -47,19 +48,32 @@ class EventAddingView extends React.Component {
     }
 
     onSaveTable(placeForm) {
-       saveNewTable(this.state.selectedPlace.id, placeForm)
-           .then(r => {
-               this.props.goToPreviousPanel();
-               this.setState({selectedTable: null})
-           })
-           .catch(e => console.log(e));
+        if (placeForm.id) {
+            updateTable(placeForm)
+                .then(r => this.afterSuccessSavingTable())
+                .catch(e => console.log(e));
+        } else {
+            saveNewTable(this.state.selectedPlace.id, placeForm)
+                .then(r => this.afterSuccessSavingTable())
+                .catch(e => console.log(e));
+        }
     }
 
-    editTable(table) {
+    afterSuccessSavingTable() {
+        this.props.goToPreviousPanel();
+        this.setState({selectedTable: null})
+    }
+
+    onEditTable(table) {
         this.setState({selectedTable: table}, () => {
             this.props.addPanelInStack(CREATE_TABLE);
         });
+    }
 
+    onDeleteTable(id) {
+        deleteTable(id)
+            .then(r => this.setState({panelShouldUpdate: true}))
+            .catch(e => console.log(e));
     }
 
     render() {
@@ -79,7 +93,10 @@ class EventAddingView extends React.Component {
                     <TableAdding
                         selectedPlace={this.state.selectedPlace}
                         addPanelInStack={this.props.addPanelInStack}
-                        onEditTable={(table) => this.editTable(table)}
+                        onEditTable={(table) => this.onEditTable(table)}
+                        onDeleteTable={(id) => this.onDeleteTable(id)}
+                        panelShouldUpdate={this.state.panelShouldUpdate}
+                        panelWasUpdated={(status) => this.setState({panelShouldUpdate: !status})}
                     />
                 </Panel>
                 <Panel id={CREATE_TABLE}>

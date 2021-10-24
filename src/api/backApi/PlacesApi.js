@@ -15,3 +15,11 @@ export const saveNewUserPlace = async (placeInfo) => {
 export const saveNewTable = async (id, tableForm) => {
     return await axiosInstance.post(`places/${id}/tables`, tableForm);
 }
+
+export const updateTable = async (tableForm) => {
+    return await axiosInstance.post(`tables/${tableForm.id}`, tableForm);
+}
+
+export const deleteTable = async (id) => {
+    return await axiosInstance.delete(`tables/${id}`);
+}

@@ -6,15 +6,20 @@ import {getPlaceTables} from "../../api/backApi/PlacesApi";
 import {CREATE_TABLE} from "./Panels";
 import {SelectableCellWithEditRemoveButtons} from "./SelectableCellWithEditRemoveButtons";
 
-export const TableAdding = ({selectedPlace, addPanelInStack, onEditTable}) => {
+export const TableAdding = ({selectedPlace, addPanelInStack, onEditTable, onDeleteTable, panelShouldUpdate, panelWasUpdated}) => {
 
     const [tables, setTables] = useState([]);
+    const [panelWasMount, setPanelWasMount] = useState(true);
 
     useEffect(() => {
-        getPlaceTables(selectedPlace.id)
-            .then(r => setTables(r.data))
-            .catch(e => console.log(e));
-    }, []);
+        if (panelShouldUpdate || panelWasMount) {
+            getPlaceTables(selectedPlace.id)
+                .then(r => setTables(r.data))
+                .catch(e => console.log(e));
+            panelWasUpdated(true);
+            setPanelWasMount(false);
+        }
+    }, [panelShouldUpdate, panelWasMount]);
 
 
     const tableCells = tables.map(table => {
@@ -28,6 +33,7 @@ export const TableAdding = ({selectedPlace, addPanelInStack, onEditTable}) => {
                     {table?.deskShape === "CIRCLE" ? 'Овальный' : 'Прямоуголный'}
                 </>}
                                                  onEdit={() => onEditTable(table)}
+                                                 onRemove={() => onDeleteTable(table.id)}
             />
         )
     })

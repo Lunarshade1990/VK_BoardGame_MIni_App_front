@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Checkbox, FormItem, Group, Input, Placeholder, Separator} from "@vkontakte/vkui";
 import {Divider, List, ListItem, ListItemButton, ListItemText, Popover} from "@material-ui/core";
 import {suggests} from "../../axios/DaDataSuggests";
@@ -6,7 +6,7 @@ import {Icon56CheckCircleOutline, Icon56NotePenOutline} from "@vkontakte/icons";
 import {StandardPanelHeader} from "../NavElements/StandardPanelHeader";
 import {CREATE_EVENT, TABLE_ADDING} from "./Panels";
 
-export const NewAddressCreating = ({userId, isPublic, onContinue}) => {
+export const NewAddressCreating = ({userId, isPublic, onContinue, selectedAddress}) => {
 
     const [address, setAddress] = useState('');
     const [name, setName] = useState('');
@@ -16,6 +16,13 @@ export const NewAddressCreating = ({userId, isPublic, onContinue}) => {
     const [suggestions, setSuggestions] = useState([]);
     const [chosenSuggestion, setChosenSuggestion] = useState(null);
     const [inputError, setInputError] = useState(null);
+
+    useEffect(() => {
+        if (selectedAddress) {
+            selectedAddress(selectedAddress.value);
+        }
+    }, [selectedAddress]);
+
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -39,7 +46,6 @@ export const NewAddressCreating = ({userId, isPublic, onContinue}) => {
                 region: "москва"
             }]
         }).then(r => {
-            console.log(r.data.suggestions);
             setSuggestions(r.data.suggestions);
             if (r.data.suggestions.length > 0) {
                 setAnchorEl(e.target)
