@@ -30,7 +30,7 @@ import {getUserInfo, getUserToken} from "./api/vkApi/bridgeApi";
 import {getCollectionWithFilters, getUserById, getUserCollection, saveUserData} from "./api/backApi/UserApi";
 import {Greetings} from "./components/newUser/Greetings";
 import {importGameCollection} from "./api/backApi/TeseraApi";
-import {GameCollectionRichCard} from "./components/boardGames/GameCollectionRichCard";
+import {GameCollection} from "./components/boardGames/GameCollection";
 import {CollectionFilterModal} from "./components/boardGames/CollectionFiltersModal";
 import {Icon24Dismiss} from "@vkontakte/icons";
 import {AppTabbar} from "./components/NavElements/AppTabbar";
@@ -168,8 +168,9 @@ const App = () => {
 							<Profile loadGameList={(id, type, setFilter) => loadGameList(id, type, setFilter)}/>
 						</Panel>
 						<Panel id="panel1.2">
-							<GameCollectionRichCard id={user.id}
-													loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
+							<GameCollection id={user.id}
+											fromProfile
+											loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
 							/>
 						</Panel>
 					</View>
@@ -178,7 +179,11 @@ const App = () => {
 							<Greetings onSubmit={(nick) => importCollectionList(nick)}/>
 						</Panel>
 					</View>
-					<EventAddingView id={"createEvent"} userId={user.id}/>
+					<EventAddingView
+						id={"createEvent"}
+						userId={user.id}
+						loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
+					/>
 				</Root>
 			</Epic>
 		</AppRoot>

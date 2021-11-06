@@ -33,3 +33,13 @@
 .Placeholder__in {
  width: 100%;
 }
+
+.MuiFormControl-root {
+ width: 100%;
+}
+
+.MuiOutlinedInput-notchedOutline {
+ border-radius: 8px !important;
+ padding: 11px !important;
+}
+

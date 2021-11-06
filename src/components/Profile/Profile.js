@@ -12,29 +12,10 @@ import {
 } from "@vkontakte/vkui";
 import {useDispatch, useSelector} from "react-redux";
 import {setActivePanel} from "../../store/rootReducer";
+import {GameImageContainer} from "../NavElements/GameImageContainer";
 
 
 export const Profile = ({loadGameList}) => {
-    const largeImageStyles = {
-        maxWidth: '100%',
-        width: 'auto',
-        height: 'auto',
-        maxHeight: '100%',
-        display: 'table-cell',
-        verticalAlign: 'middle',
-        textAlign: 'center'
-
-    };
-
-    const imageContainer = {
-        width: 80,
-        height: 100,
-        borderRadius: 8,
-        border: '1px solid var(--placeholder_icon_background)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-    }
 
     const user = useSelector((state) => state.rootReducer.user);
     const loading = useSelector((state) => state.rootReducer.loading);
@@ -78,9 +59,7 @@ export const Profile = ({loadGameList}) => {
                             .map((item) => {
                                 return (
                                     <HorizontalCell size='l' header={item.name.slice(0,30).trim()} key={item.id}>
-                                        <Div style={imageContainer}>
-                                            <img style={largeImageStyles} src={item.picture} alt={""}/>
-                                        </Div>
+                                        <GameImageContainer src={item.picture} width={80} height={100} border padding/>
                                     </HorizontalCell>
                                 )
                             })}

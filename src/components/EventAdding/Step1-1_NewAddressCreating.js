@@ -5,8 +5,9 @@ import {suggests} from "../../axios/DaDataSuggests";
 import {Icon56CheckCircleOutline, Icon56NotePenOutline} from "@vkontakte/icons";
 import {StandardPanelHeader} from "../NavElements/StandardPanelHeader";
 import {CREATE_EVENT, TABLE_ADDING} from "./Panels";
+import {ListPopover} from "../NavElements/ListPopover";
 
-export const NewAddressCreating = ({userId, isPublic, onContinue, selectedAddress}) => {
+export const NewAddressCreating = ({userId, isPublic, onContinue, selectedAddress, setSelectedAddress}) => {
 
     const [address, setAddress] = useState('');
     const [name, setName] = useState('');
@@ -19,7 +20,7 @@ export const NewAddressCreating = ({userId, isPublic, onContinue, selectedAddres
 
     useEffect(() => {
         if (selectedAddress) {
-            selectedAddress(selectedAddress.value);
+            setAddress(selectedAddress.address);
         }
     }, [selectedAddress]);
 
@@ -27,9 +28,6 @@ export const NewAddressCreating = ({userId, isPublic, onContinue, selectedAddres
     const handleClose = () => {
         setAnchorEl(null);
     };
-
-    const open = Boolean(anchorEl);
-    const id = open ? 'simple-popover' : undefined;
 
     const onAddressChose = (addr) => {
         setAddress(addr.value);
@@ -55,7 +53,7 @@ export const NewAddressCreating = ({userId, isPublic, onContinue, selectedAddres
 
     const onContinueButtonClick = (panel) => {
         if (!chosenSuggestion || chosenSuggestion.value !== address) {
-            setInputError({message: 'Адрес не заполнен или введён вручную'})
+            setInputError({message: 'Адрес не заполнен или введён вручную - выберите из подсказок'})
         } else {
             setInputError(null);
             const placeConf = {
@@ -72,15 +70,15 @@ export const NewAddressCreating = ({userId, isPublic, onContinue, selectedAddres
         }
     }
 
-    const listItems = suggestions.map(s => {
-        return (
-            <ListItem disablePadding>
-                <ListItemButton onClick={() => onAddressChose(s)}>
-                    <ListItemText primary={s.value} />
-                </ListItemButton>
-            </ListItem>
-        )
-    })
+    const suggestionsListConf = {
+        onItemChoose: (suggestion) => onAddressChose(suggestion),
+        items: suggestions.map(s => {
+            return {
+                text: s.value,
+                item: s
+            }
+        })
+    }
 
     const nameInput = !isPublic ? null : (
         <FormItem top={"Название"}>
@@ -103,21 +101,13 @@ export const NewAddressCreating = ({userId, isPublic, onContinue, selectedAddres
                     bottom={inputError ? inputError.message : ''}
                 >
                     <Input placeholder={"Введите адрес"} value={address} onChange={onAddressChange}/>
-                    <Popover
-                        disableAutoFocus={true}
-                        id={id}
-                        open={open}
+                    <ListPopover
+                        disableAutoFocus
                         anchorEl={anchorEl}
-                        onClose={handleClose}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                        }}
-                    >
-                        <List>
-                            {listItems}
-                        </List>
-                    </Popover>
+                        handleClose={handleClose}
+                        listConf={suggestionsListConf}
+
+                    />
                 </FormItem>
                 <FormItem>
                     {isHomeAddressCheckbox}

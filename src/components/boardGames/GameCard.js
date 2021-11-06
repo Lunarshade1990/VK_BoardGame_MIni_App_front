@@ -3,7 +3,7 @@ import {
     AccordionDetails,
     AccordionSummary,
     Box,
-    Card,
+    Card, CardActionArea,
     CardContent,
     CardMedia,
     Divider,
@@ -15,7 +15,7 @@ import {declOfNum} from "../../Util/Util";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import React from "react";
 
-export const GameCard = ({game}) => {
+export const GameCard = ({game, onCardClick}) => {
 
     const titles = ['человека', 'человек', 'человека']
 
@@ -36,6 +36,7 @@ export const GameCard = ({game}) => {
 
     return (
         <Card sx={cardStyle} key={game.id}>
+            <CardActionArea onClick={onCardClick}>
             <CardContent>
                 <Typography sx={typographyHeader} component="div" variant="h6">
                     {game.name}
@@ -78,6 +79,7 @@ export const GameCard = ({game}) => {
                     </Box>
                 </Box>
             </Box>
+            </CardActionArea>
             <Box>
                 <Accordion>
                     <AccordionSummary

@@ -6,11 +6,27 @@ import {deleteTable, saveNewTable, saveNewUserPlace, updateTable} from "../../ap
 import {TableAdding} from "./Step1-2_TableAdding";
 import {connect} from "react-redux";
 import {addPanelInStack, goToPreviousPanel} from "../../store/rootReducer";
-import {CREATE_TABLE, NEW_ADDRESS_CREATING, PLACE_CHOICE, TABLE_ADDING} from "./Panels";
+import {
+    CREATE_TABLE,
+    EVENT_TYPE_SELECTION,
+    GAME_SELECTING,
+    NEW_ADDRESS_CREATING,
+    PLACE_CHOICE,
+    PLAY_FORM,
+    TABLE_ADDING
+} from "./Panels";
 import {CreateTableForm} from "./Step1-3_CreateTableForm";
+import {EventTypeSelection} from "./Step2-1_EventTypeSelection";
+import {GameCollection} from "../boardGames/GameCollection";
+import {GameEvent} from "./GameEvent/GameEvent";
+import {EventPlay} from "./GameEvent/EventPlay";
+import {EventTable} from "./GameEvent/EventTable";
+import {PlayForm} from "./Step2-3_PlayForm";
+import produce from "immer"
 
 const mapStateToProps = (state) => ({
-    panelStack: state.rootReducer.panelStack
+    panelStack: state.rootReducer.panelStack,
+    user: state.rootReducer.user
 });
 
 const mapDispatchToProps = {addPanelInStack, goToPreviousPanel};
@@ -23,14 +39,69 @@ class EventAddingView extends React.Component {
             isPublic: false,
             selectedPlace: {},
             selectedTable: null,
-            panelShouldUpdate: true
+            panelShouldUpdate: true,
+            gameEvent: null,
+            selectedPlay: {},
+            currentTableId: null,
+            currentPlayId: null
         }
+
+    }
+
+    onPlaceSelect(place) {
+        this.setState({selectedPlace: {...place}},
+            () => this.props.addPanelInStack(EVENT_TYPE_SELECTION)
+        );
+    }
+
+    onEventTypeSelect(type) {
+        const gameEvent = new GameEvent(type);
+        if (type === 'simple') {
+            const virtualTable = new EventTable('virtual');
+            const tableId = gameEvent.addTable(virtualTable);
+            const newPlay = new EventPlay();
+            const playId = virtualTable.addPlay(newPlay)
+            this.setState({currentTableId: tableId, currentPlayId: playId})
+        }
+        this.setState({
+            gameEvent: {...gameEvent}
+        }, () => this.props.addPanelInStack(GAME_SELECTING));
     }
 
     clickAddPlaceButton(isPublic) {
         this.setState({
             isPublic: isPublic
         }, () => this.props.addPanelInStack(NEW_ADDRESS_CREATING));
+    }
+
+    onGameSelect(game) {
+        const gameEvent = this.state.gameEvent;
+        const play = gameEvent
+            .getTableById(this.state.currentTableId)
+            .getPlayById(this.state.currentPlayId);
+        play.game = game;
+
+        this.setState(produce(draft => {
+                draft.gameEvent = gameEvent
+            }
+        ), () => this.props.addPanelInStack(PLAY_FORM))
+
+        // const updatedEvent = {...this.state.gameEvent}
+        // const play = updatedEvent
+        //     .getTableById(this.state.currentTableId)
+        //     .getPlayById(this.state.currentPlayId);
+        // play.game = {...game};
+        // this.setState({gameEvent: updatedEvent},
+        //     () => this.props.addPanelInStack(PlayForm));
+    }
+
+    getCurrentPlay() {
+        if (this.state.gameEvent) {
+            const currentPlay = this.state.gameEvent
+                .getTableById(this.state.currentTableId)
+                .getPlayById(this.state.currentPlayId)
+            return {...currentPlay}
+        } else return null;
     }
 
     saveNewUserPlace(panel, placeConf) {
@@ -81,13 +152,23 @@ class EventAddingView extends React.Component {
             <View activePanel={this.getActivePanel()} id={"createEvent"}>
                 <Panel id={PLACE_CHOICE}>
                     <PlaceChoice userId={this.props.userId}
+                                 onPlaceSelect = {(place) => this.onPlaceSelect(place)}
                                  onNewPlace = {(isPublic) => this.clickAddPlaceButton(isPublic)}/>
+                </Panel>
+                <Panel id={EVENT_TYPE_SELECTION}>
+                    <EventTypeSelection
+                        place = {this.state.selectedPlace}
+                        onTypeSelect = {(type) => this.onEventTypeSelect(type)}
+                    />
                 </Panel>
                 <Panel id={NEW_ADDRESS_CREATING}>
                     <NewAddressCreating
                         userId={this.props.userId}
                         isPublic={this.state.isPublic}
-                        onContinue={(panel, placeConf) => this.saveNewUserPlace(panel, placeConf)}/>
+                        onContinue={(panel, placeConf) => this.saveNewUserPlace(panel, placeConf)}
+                        selectedAddress={this.state.selectedPlace}
+                        setSelectedAddress={(selectedAddress) => this.setState({selectedPlace: selectedAddress})}
+                    />
                 </Panel>
                 <Panel id={TABLE_ADDING}>
                     <TableAdding
@@ -103,6 +184,19 @@ class EventAddingView extends React.Component {
                     <CreateTableForm
                         onSaveTable={(placeForm) => this.onSaveTable(placeForm)}
                         table={this.state.selectedTable}
+                    />
+                </Panel>
+                <Panel id={GAME_SELECTING}>
+                    <GameCollection
+                        loadGameList={this.props.loadGameList}
+                        onCardClick = {(game) => this.onGameSelect(game)}
+                    />
+                </Panel>
+                <Panel id={PLAY_FORM}>
+                    <PlayForm
+                        place={this.state.selectedPlace}
+                        play={this.getCurrentPlay()}
+                        user={this.props.user}
                     />
                 </Panel>
             </View>

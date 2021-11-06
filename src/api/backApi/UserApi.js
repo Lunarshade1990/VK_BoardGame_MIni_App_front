@@ -15,13 +15,23 @@ const getUserCollection = async (id, type) => {
 
 
 export const getCollectionWithFilters = async (id, type, filterConfig, size = 10, page = 1) => {
-    return await axiosInstance.get(`user/${id}/collection/${type}`, {
-        params: {
-            ...filterConfig,
-            size,
-            page,
+        if (type === 'ALL' || type === null) {
+            return await axiosInstance.get(`boardgames`, {
+                params: {
+                    ...filterConfig,
+                    size,
+                    page,
+                }
+            })}
+        else {
+            return await axiosInstance.get(`user/${id}/collection/${type}`, {
+                params: {
+                    ...filterConfig,
+                    size,
+                    page,
+                }
+            });
         }
-    });
 }
 
 export const getUserPlaces = async (id) => {
