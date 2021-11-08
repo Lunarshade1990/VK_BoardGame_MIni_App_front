@@ -152,7 +152,7 @@ class EventAddingView extends React.Component {
 
     render() {
         return (
-            <View activePanel={this.getActivePanel()} id={"createEvent"}>
+            <View activePanel={this.props.activePanel} id={"createEvent"}>
                 <Panel id={PLACE_CHOICE}>
                     <PlaceChoice userId={this.props.userId}
                                  onPlaceSelect = {(place) => this.onPlaceSelect(place)}

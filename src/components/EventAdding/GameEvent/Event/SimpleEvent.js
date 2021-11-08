@@ -21,7 +21,7 @@ export const SimpleEvent = ({event, userId}) => {
     })
 
     return (
-        <>
+        <Group>
             <StandardPanelHeader title={headerContent} showBack/>
             {plays}
             <Group mode="card">
@@ -31,7 +31,7 @@ export const SimpleEvent = ({event, userId}) => {
                     </Button>
                 </Div>
             </Group>
-        </>
+        </Group>
 
     )
 }

@@ -1,7 +1,8 @@
 import React, {useEffect} from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
 import {
-	AppRoot,
+	AdaptivityProvider,
+	AppRoot, ConfigProvider,
 	Epic,
 	IOS,
 	ModalPage,
@@ -10,7 +11,7 @@ import {
 	Panel,
 	PanelHeaderButton,
 	PanelHeaderClose,
-	Root,
+	Root, SplitLayout,
 	usePlatform,
 	View,
 	withAdaptivity, withPlatform
@@ -35,6 +36,7 @@ import {CollectionFilterModal} from "./components/boardGames/CollectionFiltersMo
 import {Icon24Dismiss} from "@vkontakte/icons";
 import {AppTabbar} from "./components/NavElements/AppTabbar";
 import EventAddingView from "./components/EventAdding/EventAddingView";
+import ViewStartingPanels from "./components/ViewStartingPanels";
 
 const App = () => {
 	const dispatch = useDispatch();
@@ -51,6 +53,10 @@ const App = () => {
 	const activePanel = useSelector((state) => state.rootReducer.activePanel);
 	const gameCollectionLoadingStatus = useSelector((state) => state.rootReducer.gameCollectionLoadingStatus);
 	const user = useSelector((state) => state.rootReducer.user);
+	const [activeStory, setActiveStory] = React.useState('profile');
+
+
+	const onStoryChange = (e) => setActiveStory(e.currentTarget.dataset.story);
 
 	useEffect(() => {
 		console.log(gameCollectionLoadingStatus);
@@ -158,35 +164,43 @@ const App = () => {
 		</ModalRoot>
 	)
 
+	const getActivePanel = () => {
+		const ind = panelStack.length - 1;
+		return panelStack[ind]
+	}
+
 
 	return (
-		<AppRoot>
-			<Epic activeStory={"profile"} tabbar={<AppTabbar/>}>
-				<Root id={"profile"} activeView={activeView}>
-					<View modal={modal} activePanel={activePanel} id="profile">
-						<Panel id="panel1.1">
-							<Profile loadGameList={(id, type, setFilter) => loadGameList(id, type, setFilter)}/>
-						</Panel>
-						<Panel id="panel1.2">
-							<GameCollection id={user.id}
-											fromProfile
-											loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
-							/>
-						</Panel>
-					</View>
-					<View activePanel="panel2.1" id="view2">
-						<Panel id="panel2.1">
-							<Greetings onSubmit={(nick) => importCollectionList(nick)}/>
-						</Panel>
-					</View>
-					<EventAddingView
-						id={"createEvent"}
-						userId={user.id}
-						loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
-					/>
-				</Root>
-			</Epic>
-		</AppRoot>
+		<ConfigProvider>
+			<AdaptivityProvider>
+					<AppRoot>
+						<Epic activeStory={activeView} tabbar={<AppTabbar activeStory={activeView} onStoryChange={(e) => dispatch(setActiveView(e.currentTarget.dataset.story))}/>}>
+								<View modal={modal} activePanel={getActivePanel()} id="profile">
+									<Panel id="panel1.1">
+										<Profile loadGameList={(id, type, setFilter) => loadGameList(id, type, setFilter)}/>
+									</Panel>
+									<Panel id="panel1.2">
+										<GameCollection id={user.id}
+														fromProfile
+														loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
+										/>
+									</Panel>
+								</View>
+								<View activePanel="panel2.1" id="view2">
+									<Panel id="panel2.1">
+										<Greetings onSubmit={(nick) => importCollectionList(nick)}/>
+									</Panel>
+								</View>
+								<EventAddingView
+									activePanel={getActivePanel()}
+									id={"createEvent"}
+									userId={user.id}
+									loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
+								/>
+						</Epic>
+					</AppRoot>
+			</AdaptivityProvider>
+		</ConfigProvider>
 
 	);
 }

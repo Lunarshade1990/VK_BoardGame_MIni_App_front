@@ -6,16 +6,7 @@ import {Tabbar, TabbarItem} from "@vkontakte/vkui";
 import {useDispatch} from "react-redux";
 import {setActiveView} from "../../store/rootReducer";
 
-export const AppTabbar = (props) => {
-
-    const dispatch = useDispatch();
-    const [activeStory, setActiveStory] = React.useState('profile');
-    const onStoryChange = (e) => setActiveStory(e.currentTarget.dataset.story);
-
-    useEffect(() => {
-        dispatch(setActiveView(activeStory));
-    }, [activeStory]);
-
+export const AppTabbar = ({activeStory, onStoryChange}) => {
     return (
         <Tabbar>
             <TabbarItem

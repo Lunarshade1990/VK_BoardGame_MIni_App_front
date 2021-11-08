@@ -11,7 +11,7 @@ import {
     SimpleCell
 } from "@vkontakte/vkui";
 import {useDispatch, useSelector} from "react-redux";
-import {setActivePanel} from "../../store/rootReducer";
+import {addPanelInStack, setActivePanel} from "../../store/rootReducer";
 import {GameImageContainer} from "../NavElements/GameImageContainer";
 
 
@@ -36,7 +36,7 @@ export const Profile = ({loadGameList}) => {
     }, [gameCollectionLoadingStatus]);
 
     const goToCollection = () => {
-        dispatch(setActivePanel("panel1.2"))
+        dispatch(addPanelInStack("panel1.2"))
     }
 
 

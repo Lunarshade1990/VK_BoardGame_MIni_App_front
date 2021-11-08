@@ -16,6 +16,7 @@ import {Icon24Filter} from '@vkontakte/icons';
 import {setActiveModal, setActivePanel, setCollectionFilter, setIsModalOpen} from "../../store/rootReducer";
 import {GameCard} from "./GameCard";
 import {ListPopover} from "../NavElements/ListPopover";
+import {StandardPanelHeader} from "../NavElements/StandardPanelHeader";
 
 const _function = require('lodash/function');
 
@@ -153,7 +154,7 @@ export const GameCollection = ({loadGameList, fromProfile, onCardClick}) => {
     return (
         !gameListPage.content ? <PanelSpinner/> :
             <>
-                <PanelHeader left={<PanelHeaderBack onClick={goBack}/>} separator={false}>Коллекция</PanelHeader>
+                <StandardPanelHeader showBack title={"Коллекция"}/>
                 <Group>
                     {collectionSwitchButtons}
                     <SubnavigationBar mode="fixed">

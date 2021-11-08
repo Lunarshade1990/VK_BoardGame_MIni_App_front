@@ -67,6 +67,7 @@ export const rootReducer = createSlice({
         setLoading (state, action) {
             state.loading = action.payload;
         },
+
         setActiveView (state, action) {
             state.activeView = action.payload;
             state.panelStack = [ViewStartingPanels[action.payload]]
@@ -191,7 +192,7 @@ export const {
     setActiveModal,
     setIsModalOpen,
     goToPreviousPanel,
-    addPanelInStack
+    addPanelInStack,
 } = rootReducer.actions
 
 export default rootReducer.reducer

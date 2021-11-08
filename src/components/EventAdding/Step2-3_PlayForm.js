@@ -202,7 +202,6 @@ export const PlayForm = ({place, play, user, onSaveEvent}) => {
                         Готово
                     </Button>
                 </Div>
-
             </Group>
         </>
     )

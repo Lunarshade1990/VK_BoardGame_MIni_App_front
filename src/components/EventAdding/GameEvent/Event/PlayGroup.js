@@ -49,19 +49,19 @@ export const PlayGroup = ({play, currUserId, userIsCreator, onUserAdd, onAnother
 
     return (
         <Group  mode="card">
-                <RichCell
-                    disabled
-                    multiline
-                    before={<Div><GameImageContainer src={play.boardGame.picture} height={100} width={80} padding border/></Div>}
-                    text={"Время: " + timeFrom + " - " + timeTo}
-                    caption={"Количество игроков: " + play.playerMinCount + " - " + play.playerMaxCount}
-                    after={userIsCreator ? <IconButton><Icon28MessageOutline /></IconButton> : null}
-                >
-                    {play.boardGame.name}
-                </RichCell>
-                <Separator/>
-                {players}
-                {addCell}
+            <RichCell
+                disabled
+                multiline
+                before={<Div><GameImageContainer src={play.boardGame.picture} height={100} width={80} padding border/></Div>}
+                text={"Время: " + timeFrom + " - " + timeTo}
+                caption={"Количество игроков: " + play.playerMinCount + " - " + play.playerMaxCount}
+                after={userIsCreator ? <IconButton><Icon28MessageOutline /></IconButton> : null}
+            >
+                {play.boardGame.name}
+            </RichCell>
+            <Separator/>
+            {players}
+            {addCell}
         </Group>
     )
 }
