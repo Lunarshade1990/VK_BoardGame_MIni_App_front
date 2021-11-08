@@ -6,6 +6,19 @@ import {IconButton} from "@vkontakte/vkui";
 
 
 export const EditRemoveIcons = ({onEdit, onRemove}) => {
+
+    const editButton = onEdit ? (
+        <IconButton>
+            <Icon28EditCircleFillBlue width={24} height={24} style={{margin: '0 1px'}} onClick={onEdit}/>
+        </IconButton>
+    ) : null;
+
+    let removeButton = onRemove ? (
+        <IconButton>
+            <Icon28CancelCircleFillRed width={24} height={24} style={{margin: '0 1px'}} color="red" onClick={onRemove}/>
+        </IconButton>
+    ) : null
+
     return (
         <>
             <IconButton>

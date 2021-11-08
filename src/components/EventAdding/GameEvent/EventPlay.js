@@ -9,7 +9,7 @@ export class EventPlay {
     timeTo;
     playersFrom;
     playersTo;
-    host
+    host;
     players = [];
     freeSpace;
 

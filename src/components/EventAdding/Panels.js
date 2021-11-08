@@ -6,3 +6,4 @@ export const CREATE_TABLE = 'CREATE_TABLE';
 export const EVENT_TYPE_SELECTION = 'EVENT_TYPE_SELECTION';
 export const GAME_SELECTING = 'GAME_SELECTING';
 export const PLAY_FORM = 'PLAY_FORM';
+export const SIMPLE_EVENT = 'SIMPLE_EVENT'

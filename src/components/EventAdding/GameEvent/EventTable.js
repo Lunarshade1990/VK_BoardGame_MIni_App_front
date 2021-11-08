@@ -2,12 +2,11 @@ export class EventTable {
 
     constructor(type, table) {
         if (table) {
-            this.table = table;
+            this.id = table.id;
         } else {
-            this.table = {id: null};
+            this.id = null;
         }
         this.type = type;
-
     }
 
     plays = []

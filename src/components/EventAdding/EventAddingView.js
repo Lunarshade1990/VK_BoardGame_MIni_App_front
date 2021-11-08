@@ -12,7 +12,7 @@ import {
     GAME_SELECTING,
     NEW_ADDRESS_CREATING,
     PLACE_CHOICE,
-    PLAY_FORM,
+    PLAY_FORM, SIMPLE_EVENT,
     TABLE_ADDING
 } from "./Panels";
 import {CreateTableForm} from "./Step1-3_CreateTableForm";
@@ -23,6 +23,8 @@ import {EventPlay} from "./GameEvent/EventPlay";
 import {EventTable} from "./GameEvent/EventTable";
 import {PlayForm} from "./Step2-3_PlayForm";
 import produce from "immer"
+import {SimpleEvent} from "./GameEvent/Event/SimpleEvent";
+import {saveNewGameEvent} from "../../api/backApi/GameEventApi";
 
 const mapStateToProps = (state) => ({
     panelStack: state.rootReducer.panelStack,
@@ -41,9 +43,10 @@ class EventAddingView extends React.Component {
             selectedTable: null,
             panelShouldUpdate: true,
             gameEvent: null,
+            responseGameEvent: null,
             selectedPlay: {},
             currentTableId: null,
-            currentPlayId: null
+            currentPlayId: null,
         }
 
     }
@@ -85,14 +88,6 @@ class EventAddingView extends React.Component {
                 draft.gameEvent = gameEvent
             }
         ), () => this.props.addPanelInStack(PLAY_FORM))
-
-        // const updatedEvent = {...this.state.gameEvent}
-        // const play = updatedEvent
-        //     .getTableById(this.state.currentTableId)
-        //     .getPlayById(this.state.currentPlayId);
-        // play.game = {...game};
-        // this.setState({gameEvent: updatedEvent},
-        //     () => this.props.addPanelInStack(PlayForm));
     }
 
     getCurrentPlay() {
@@ -147,6 +142,14 @@ class EventAddingView extends React.Component {
             .catch(e => console.log(e));
     }
 
+    onSaveEvent(eventForm) {
+        saveNewGameEvent(eventForm)
+            .then(r => {
+                this.setState({responseGameEvent: r.data}, () => this.props.addPanelInStack(SIMPLE_EVENT));
+            })
+            .catch(e => console.log(e));
+    }
+
     render() {
         return (
             <View activePanel={this.getActivePanel()} id={"createEvent"}>
@@ -197,7 +200,11 @@ class EventAddingView extends React.Component {
                         place={this.state.selectedPlace}
                         play={this.getCurrentPlay()}
                         user={this.props.user}
+                        onSaveEvent={(playForm) => this.onSaveEvent(playForm)}
                     />
+                </Panel>
+                <Panel id={SIMPLE_EVENT}>
+                    <SimpleEvent event={this.state.responseGameEvent} userId={this.props.userId}/>
                 </Panel>
             </View>
         )

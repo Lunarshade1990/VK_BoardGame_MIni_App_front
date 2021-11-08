@@ -13,7 +13,7 @@ import {
 	Root,
 	usePlatform,
 	View,
-	withAdaptivity
+	withAdaptivity, withPlatform
 } from "@vkontakte/vkui";
 import {Profile} from "./components/Profile/Profile";
 import {useDispatch, useSelector} from "react-redux";
@@ -191,4 +191,4 @@ const App = () => {
 	);
 }
 
-export default withAdaptivity(App, { viewWidth: true });
+export default withPlatform(withAdaptivity(App, { viewWidth: true }));

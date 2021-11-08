@@ -9,8 +9,9 @@ import {WarningBottomText} from "../NavElements/WarningBottomText";
 import {EventPlay} from "./GameEvent/EventPlay";
 import {EventTable} from "./GameEvent/EventTable";
 import {GameEvent} from "./GameEvent/GameEvent";
+import {saveNewGameEvent} from "../../api/backApi/GameEventApi";
 
-export const PlayForm = ({place, play, user}) => {
+export const PlayForm = ({place, play, user, onSaveEvent}) => {
 
     const game = play.game
     const [timeFrom, setTimeFrom] = useState(new Date());
@@ -128,7 +129,7 @@ export const PlayForm = ({place, play, user}) => {
         eventPlay.addPlayer(user.id, true);
         const eventTable = new EventTable('virtual');
         eventTable.addPlay(eventPlay);
-        const gameEvent = new GameEvent('simple');
+        const gameEvent = new GameEvent('simple', user.id, place.id);
         gameEvent.addTable(eventTable);
         return gameEvent;
     }
@@ -136,7 +137,7 @@ export const PlayForm = ({place, play, user}) => {
     const onSaveButton = () => {
         formValidation();
         if (finalValidation()) {
-            console.log(JSON.stringify(createSimpleEvent()));
+            onSaveEvent(createSimpleEvent())
         } else alert("Ошибка!")
     }
 

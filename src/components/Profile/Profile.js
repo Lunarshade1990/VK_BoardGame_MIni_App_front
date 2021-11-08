@@ -47,7 +47,7 @@ export const Profile = ({loadGameList}) => {
     if (gameList.length > 0) {
         collection = (
             <Group mode="plain">
-                <Header mode="primary"  aside={<Button mode="tertiary">Показать все ></Button>} onClick={goToCollection}>Коллекция</Header>
+                <Header mode="primary"  aside={<Button mode="tertiary">Показать все</Button>} onClick={goToCollection}>Коллекция</Header>
                 <HorizontalScroll>
                     <div style={{ display: 'flex' }}>
                         {[...gameList].sort((a, b) => {
