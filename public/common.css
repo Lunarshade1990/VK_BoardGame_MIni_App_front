@@ -43,3 +43,11 @@
  padding: 11px !important;
 }
 
+.ContentCard__img {
+ height: 200px !important;
+ width: 200px !important;
+ max-height: 200px !important;
+ max-width: 200px !important;
+ background-size: contain !important;
+ background-position: center !important;
+}

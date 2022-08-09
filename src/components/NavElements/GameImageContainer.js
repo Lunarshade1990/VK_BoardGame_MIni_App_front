@@ -1,7 +1,7 @@
 import React from "react";
 import {Div} from "@vkontakte/vkui";
 
-export const GameImageContainer = ({src, width, height, border, padding}) => {
+export const GameImageContainer = ({src, width, height, border, padding, roundCorner}) => {
 
    let horizontalPadding = 16;
    let verticalPadding = 12;
@@ -18,7 +18,8 @@ export const GameImageContainer = ({src, width, height, border, padding}) => {
     const imageContainer = {
         width: width,
         height: height,
-        borderRadius: 8,
+        overflow: "hidden",
+        borderRadius: roundCorner ? 8 : 0,
         paddingTop: verticalPadding,
         paddingBottom: verticalPadding,
         paddingRight: horizontalPadding,
@@ -30,14 +31,9 @@ export const GameImageContainer = ({src, width, height, border, padding}) => {
     }
 
     const largeImageStyles = {
-        maxWidth: '100%',
-        width: 'auto',
-        height: 'auto',
-        maxHeight: '100%',
-        display: 'table-cell',
-        verticalAlign: 'middle',
-        textAlign: 'center'
-
+       width: '100%',
+        height: '100%',
+        objectFit: "scale-down"
     };
 
     return (

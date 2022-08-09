@@ -15,7 +15,6 @@ export const WarningBottomText = ({text}) => {
 
     const textStyle = {
         color: "#FF8800"
-
     }
 
     return (

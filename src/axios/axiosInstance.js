@@ -15,6 +15,7 @@ const buildHeader = () => {
 
 const instance = axios.create({
     baseURL: 'http://localhost:8080/',
+    timeout: 600000,
     headers: buildHeader(),
     paramsSerializer: params => Qs.stringify(params, {arrayFormat: 'comma'} )
 });

@@ -5,7 +5,7 @@ import {
     Group,
     Header,
     HorizontalCell,
-    HorizontalScroll,
+    HorizontalScroll, IconButton,
     InfoRow,
     PanelSpinner,
     SimpleCell
@@ -13,9 +13,11 @@ import {
 import {useDispatch, useSelector} from "react-redux";
 import {addPanelInStack, setActivePanel} from "../../store/rootReducer";
 import {GameImageContainer} from "../NavElements/GameImageContainer";
+import {EventHorizontalScroll} from "../EventAdding/GameEvent/Event/EventHorizontalScroll";
+import { Icon28RefreshOutline } from '@vkontakte/icons';
 
 
-export const Profile = ({loadGameList}) => {
+export const Profile = ({loadGameList, userEventList, loadUserEvents, userEvents, refreshGameCollection, refreshOwnActive}) => {
 
     const user = useSelector((state) => state.rootReducer.user);
     const loading = useSelector((state) => state.rootReducer.loading);
@@ -25,12 +27,14 @@ export const Profile = ({loadGameList}) => {
 
     useEffect(() => {
         if (user.id && gameCollectionLoadingStatus === 'idle') {
+            loadUserEvents(user.id, 'actual');
             loadGameList(user.id, "OWN", true);
         }
     }, [user]);
 
     useEffect(() => {
         if (gameCollectionLoadingStatus === 'finish') {
+            loadUserEvents(user.id, 'actual');
             loadGameList(user.id, "OWN", true);
         }
     }, [gameCollectionLoadingStatus]);
@@ -44,9 +48,10 @@ export const Profile = ({loadGameList}) => {
 
     const gameList = gameListPage.content;
 
+
     if (gameList.length > 0) {
         collection = (
-            <Group mode="plain">
+            <Group>
                 <Header mode="primary"  aside={<Button mode="tertiary">Показать все</Button>} onClick={goToCollection}>Коллекция</Header>
                 <HorizontalScroll>
                     <div style={{ display: 'flex' }}>
@@ -59,7 +64,7 @@ export const Profile = ({loadGameList}) => {
                             .map((item) => {
                                 return (
                                     <HorizontalCell size='l' header={item.name.slice(0,30).trim()} key={item.id}>
-                                        <GameImageContainer src={item.picture} width={80} height={100} border padding/>
+                                        <GameImageContainer src={item.picture} width={80} height={100} border padding roundCorner/>
                                     </HorizontalCell>
                                 )
                             })}
@@ -73,7 +78,7 @@ export const Profile = ({loadGameList}) => {
     if (!loading) {
         profile = (
             <>
-                <Group mode="plain">
+                <Group>
                     <Header mode="primary">Основная информация</Header>
                     <SimpleCell>
                         <InfoRow header="Город">
@@ -85,13 +90,14 @@ export const Profile = ({loadGameList}) => {
                             {user.firstName} {user.secondName}
                         </InfoRow>
                     </SimpleCell>
-                    <SimpleCell>
+                    <SimpleCell after={<IconButton disabled={!refreshOwnActive} onClick={refreshGameCollection}><Icon28RefreshOutline/></IconButton>}>
                         <InfoRow header="Профиль на тесере">
                             {user.teseraProfile ? user.teseraProfile : "Профиль не указан"}
                         </InfoRow>
                     </SimpleCell>
                 </Group>
                 {collection}
+                <EventHorizontalScroll eventList={userEvents} title="Мои запланированные игры" limit={10}/>
             </>
         )
     }

@@ -27,6 +27,7 @@
     "@material-ui/icons": "^5.0.0-beta.1",
     "@mui/icons-material": "^5.0.5",
     "@reduxjs/toolkit": "^1.6.1",
+    "@styled-icons/icomoon": "^10.34.0",
     "@vkontakte/icons": "^1.120.0",
     "@vkontakte/vk-bridge": "^2.4.6",
     "@vkontakte/vk-miniapps-deploy": "0.0.25",

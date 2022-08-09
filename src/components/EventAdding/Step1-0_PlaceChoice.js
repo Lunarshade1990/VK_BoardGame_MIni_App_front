@@ -6,7 +6,8 @@ import {Icon28AddOutline, Icon28MessageOutline} from "@vkontakte/icons";
 import {StandardPanelHeader} from "../NavElements/StandardPanelHeader";
 import {SelectableCellWithEditRemoveButtons} from "./SelectableCellWithEditRemoveButtons";
 
-export const PlaceChoice = ({userId, onNewPlace, onPlaceSelect}) => {
+
+export const PlaceChoice = ({userId, onNewPlace, onPlaceSelect, clearState}) => {
 
     const headerTitle = "Выбор места";
 
@@ -15,16 +16,16 @@ export const PlaceChoice = ({userId, onNewPlace, onPlaceSelect}) => {
     const [userPlacesLoading, setUserPlacesLoading] = useState(true);
     const [publicPlacesLoading, setPublicPlacesLoading] = useState(true);
 
+
     useEffect(() => {
+        setTimeout(clearState, 500);
         getUserPlaces(userId)
             .then(r => {
                 setUserPlaces(r.data);
                 setUserPlacesLoading(false);
             })
             .catch(_e => setUserPlacesLoading(false));
-    }, []);
 
-    useEffect(() => {
         getPublicPlaces(userId)
             .then(r => {
                 setPublicPlaces(r.data)

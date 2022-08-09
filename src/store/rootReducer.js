@@ -79,6 +79,14 @@ export const rootReducer = createSlice({
             state.activePanel = state.panelStack[ind];
         },
 
+        removePreviousPanels(state, action) {
+           state.panelStack.splice(action.payload.offset * -1, action.payload.count);
+        },
+
+        setNewPanelStack(state,action) {
+            state.panelStack = action.payload
+        },
+
         goToPreviousPanel (state) {
             state.panelStack.pop();
             const ind = state.panelStack.length - 1;
@@ -193,6 +201,8 @@ export const {
     setIsModalOpen,
     goToPreviousPanel,
     addPanelInStack,
+    removePreviousPanels,
+    setNewPanelStack
 } = rootReducer.actions
 
 export default rootReducer.reducer

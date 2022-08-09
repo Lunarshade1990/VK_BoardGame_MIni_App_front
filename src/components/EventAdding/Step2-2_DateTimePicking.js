@@ -7,7 +7,17 @@ import TextField from '@mui/material/TextField';
 import ruLocale from 'date-fns/locale/ru';
 
 
-export const DateTimePicking = ({valueFrom, setValueFrom, valueTo, setValueTo, bottomText, fromError, toError, validateFunc}) => {
+export const DateTimePicking = ({
+                                    valueFrom,
+                                    setValueFrom,
+                                    valueTo,
+                                    setValueTo,
+                                    bottomText,
+                                    fromError,
+                                    toError,
+                                    validateFunc,
+                                    onFromClose
+                                }) => {
 
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns} locale={ruLocale}>
@@ -18,6 +28,7 @@ export const DateTimePicking = ({valueFrom, setValueFrom, valueTo, setValueTo, b
                     bottom={fromError.error ? fromError.text : bottomText}
                 >
                     <MobileDateTimePicker
+                        onClose={onFromClose}
                         onBlur={validateFunc}
                         minDateTime={new Date()}
                         value={valueFrom}

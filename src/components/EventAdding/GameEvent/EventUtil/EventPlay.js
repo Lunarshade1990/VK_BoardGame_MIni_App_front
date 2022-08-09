@@ -1,6 +1,8 @@
 export class EventPlay {
 
     constructor() {
+        this.players = [];
+        this.virtualPlayers = [];
     }
 
     id;
@@ -10,8 +12,9 @@ export class EventPlay {
     playersFrom;
     playersTo;
     host;
-    players = [];
     freeSpace;
+    comment;
+    tableId;
 
     addPlayer = (player, host) => {
         if (host) {

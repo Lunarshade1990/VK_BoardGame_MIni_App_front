@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import '@vkontakte/vkui/dist/vkui.css';
 import {
 	AdaptivityProvider,
@@ -28,7 +28,13 @@ import {
 	setUserId
 } from "./store/rootReducer";
 import {getUserInfo, getUserToken} from "./api/vkApi/bridgeApi";
-import {getCollectionWithFilters, getUserById, getUserCollection, saveUserData} from "./api/backApi/UserApi";
+import {
+	getCollectionWithFilters,
+	getUserById,
+	getUserCollection,
+	getUserEvents,
+	saveUserData
+} from "./api/backApi/UserApi";
 import {Greetings} from "./components/newUser/Greetings";
 import {importGameCollection} from "./api/backApi/TeseraApi";
 import {GameCollection} from "./components/boardGames/GameCollection";
@@ -41,19 +47,15 @@ import ViewStartingPanels from "./components/ViewStartingPanels";
 const App = () => {
 	const dispatch = useDispatch();
 	const activeView = useSelector((state) => state.rootReducer.activeView);
-	const filtersCount = useSelector((state) => state.rootReducer.countOfActiveFilters);
 	const filtersChange = useSelector((state) => state.rootReducer.filtersChange);
 	const collectionFilter = useSelector((state) => state.rootReducer.collectionFilter);
-	const collectionFilterParams = useSelector((state) => state.rootReducer.collectionFilterParams);
-	const gameListInfo = useSelector((state) => state.rootReducer.gameListInfo);
 	const activeModal = useSelector((state) => state.rootReducer.activeModal);
-	const isModalOpen = useSelector((state) => state.rootReducer.isModalOpen);
-	const gameList = useSelector((state) => state.rootReducer.gameList);
 	const panelStack = useSelector((state) => state.rootReducer.panelStack);
-	const activePanel = useSelector((state) => state.rootReducer.activePanel);
 	const gameCollectionLoadingStatus = useSelector((state) => state.rootReducer.gameCollectionLoadingStatus);
 	const user = useSelector((state) => state.rootReducer.user);
+	const [userEvents, setUserEvents] = useState([]);
 	const [activeStory, setActiveStory] = React.useState('profile');
+	const [refreshOwnActive, setRefreshOwnActive] = useState(true);
 
 
 	const onStoryChange = (e) => setActiveStory(e.currentTarget.dataset.story);
@@ -104,11 +106,29 @@ const App = () => {
 		)
 	}
 
+	const refreshGameCollection = () => {
+		setRefreshOwnActive(false);
+		importGameCollection(user.teseraProfile)
+			.then(data => {
+				loadGameList(user.id, "OWN");
+				setRefreshOwnActive(true);
+			})
+			.catch(error => {
+				console.log(error);
+				setRefreshOwnActive(true)
+			});
+	}
+
 	const loadGameList = (id, type, setFilter) => {
 		getUserCollection(id, type)
 			.then(response => {
 				dispatch(setGameList({data: response.data, setFilter}));
 			})
+	}
+
+	const loadUserEventList = (id, type) => {
+		getUserEvents(id, type)
+			.then(r => setUserEvents(r.data))
 	}
 
 	const loadGameListWithFilter = (id, type, setFilter, size = 10, page = 1) => {
@@ -173,32 +193,38 @@ const App = () => {
 	return (
 		<ConfigProvider>
 			<AdaptivityProvider>
-					<AppRoot>
-						<Epic activeStory={activeView} tabbar={<AppTabbar activeStory={activeView} onStoryChange={(e) => dispatch(setActiveView(e.currentTarget.dataset.story))}/>}>
-								<View modal={modal} activePanel={getActivePanel()} id="profile">
-									<Panel id="panel1.1">
-										<Profile loadGameList={(id, type, setFilter) => loadGameList(id, type, setFilter)}/>
-									</Panel>
-									<Panel id="panel1.2">
-										<GameCollection id={user.id}
-														fromProfile
-														loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
-										/>
-									</Panel>
-								</View>
-								<View activePanel="panel2.1" id="view2">
-									<Panel id="panel2.1">
-										<Greetings onSubmit={(nick) => importCollectionList(nick)}/>
-									</Panel>
-								</View>
-								<EventAddingView
-									activePanel={getActivePanel()}
-									id={"createEvent"}
-									userId={user.id}
-									loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
+				<AppRoot>
+					<Epic activeStory={activeView} tabbar={<AppTabbar activeStory={activeView} onStoryChange={(e) => dispatch(setActiveView(e.currentTarget.dataset.story))}/>}>
+						<View modal={modal} activePanel={getActivePanel()} id="profile">
+							<Panel id="panel1.1">
+								<Profile
+									loadGameList={(id, type, setFilter) => loadGameList(id, type, setFilter)}
+									loadUserEvents={(id, type) => loadUserEventList(id, type)}
+									userEvents={userEvents}
+									refreshGameCollection={refreshGameCollection}
+									refreshOwnActive={refreshOwnActive}
 								/>
-						</Epic>
-					</AppRoot>
+							</Panel>
+							<Panel id="panel1.2">
+								<GameCollection id={user.id}
+												fromProfile
+												loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
+								/>
+							</Panel>
+						</View>
+						<View activePanel="panel2.1" id="view2">
+							<Panel id="panel2.1">
+								<Greetings onSubmit={(nick) => importCollectionList(nick)}/>
+							</Panel>
+						</View>
+						<EventAddingView
+							activePanel={getActivePanel()}
+							id={"createEvent"}
+							userId={user.id}
+							loadGameList={(type, page) => loadGameListWithFilter(user.id, type, false, 10, page)}
+						/>
+					</Epic>
+				</AppRoot>
 			</AdaptivityProvider>
 		</ConfigProvider>
 

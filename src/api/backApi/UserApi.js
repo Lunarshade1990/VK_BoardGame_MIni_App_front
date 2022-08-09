@@ -13,6 +13,10 @@ const getUserCollection = async (id, type) => {
     return await axiosInstance.get(`user/${id}/collection/${type}`);
 }
 
+export const getUserEvents = async (id, type) => {
+    return await axiosInstance.get(`user/${id}/events/${type}`);
+}
+
 
 export const getCollectionWithFilters = async (id, type, filterConfig, size = 10, page = 1) => {
         if (type === 'ALL' || type === null) {
